@@ -42,8 +42,8 @@ Phase 1 — Walking Skeleton:
 	- @done All user-facing strings use String(localized:) @done(2026-06-22)
 	- @done SMAppService spike — minimal throwaway helper to validate signing and installation flow @done(2026-06-22)
 	- @done Update .taskpaper with any discoveries or adjustments @done(2026-06-22)
-	- Manual test: menu bar icon appears, popover opens, real SSID and signal shown
-	- Regression test: n/a (first phase)
+	- @done Manual test: menu bar icon appears, popover opens, real SSID and signal shown @done(2026-06-22)
+	- @done Regression test: n/a (first phase) @done(2026-06-22)
 	Discoveries:
 		- @Observable requires macOS 14+; using ObservableObject/@Published for macOS 13 compat
 		- Swift 6 strict concurrency: NetworkMonitor needs @unchecked Sendable for NWPathMonitor callbacks
@@ -51,6 +51,9 @@ Phase 1 — Walking Skeleton:
 		- XcodeGen overwrites entitlements — use entitlements.properties in project.yml to define them
 		- xcode-select pointing to CommandLine Tools — use DEVELOPER_DIR env var to target Xcode-beta
 		- CWInterface uses rssiValue() not rssi()
+		- NWPathMonitor.pathUpdateHandler fires async — must also read currentPath synchronously on start to avoid stale initial UI
+		- CLLocationManager.requestWhenInUseAuthorization() may not show dialog for debug builds outside /Applications — user must grant manually in System Settings
+		- CWInterface.ssid() returns nil without Location Services; channel/signal/IP still work — display "Wi-Fi Connected" as fallback
 
 Phase 2 — Wi-Fi Management:
 	Branch: phase/2-wifi-management

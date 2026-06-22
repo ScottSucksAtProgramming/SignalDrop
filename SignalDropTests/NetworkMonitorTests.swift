@@ -3,6 +3,7 @@ import Network
 @testable import SignalDrop
 
 final class MockPathMonitor: NetworkPathProviding {
+    var currentPath: NWPath { NWPathMonitor().currentPath }
     var pathUpdateHandler: (@Sendable (NWPath) -> Void)?
     var isStarted = false
     var isCancelled = false

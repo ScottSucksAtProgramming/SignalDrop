@@ -18,6 +18,7 @@ final class NetworkMonitor: ObservableObject, @unchecked Sendable {
             self?.handlePathUpdate(path)
         }
         pathMonitor.start(queue: monitorQueue)
+        handlePathUpdate(pathMonitor.currentPath)
         refreshWiFiInfo()
     }
 

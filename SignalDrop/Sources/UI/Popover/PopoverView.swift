@@ -26,12 +26,9 @@ struct PopoverView: View {
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(networkMonitor.state.ssid ?? String(localized: "Not Connected"))
+                Text(networkName)
                     .font(.headline)
-                    .accessibilityLabel(
-                        networkMonitor.state.ssid
-                            ?? String(localized: "Not connected to any network")
-                    )
+                    .accessibilityLabel(networkNameAccessibilityLabel)
 
                 Text(connectionStatusText)
                     .font(.caption)
@@ -95,6 +92,30 @@ struct PopoverView: View {
             }
         }
         .accessibilityLabel(signalAccessibilityLabel)
+    }
+
+    private var networkName: String {
+        if let ssid = networkMonitor.state.ssid {
+            return ssid
+        }
+        if networkMonitor.state.isConnected {
+            return switch networkMonitor.state.connectionType {
+            case .ethernet, .wifiAndEthernet: String(localized: "Ethernet")
+            case .wifi: String(localized: "Wi-Fi Connected")
+            case .none: String(localized: "Not Connected")
+            }
+        }
+        return String(localized: "Not Connected")
+    }
+
+    private var networkNameAccessibilityLabel: String {
+        if let ssid = networkMonitor.state.ssid {
+            return String(localized: "Connected to \(ssid)")
+        }
+        if networkMonitor.state.isConnected {
+            return String(localized: "Connected via \(connectionStatusText)")
+        }
+        return String(localized: "Not connected to any network")
     }
 
     private var statusIconName: String {
