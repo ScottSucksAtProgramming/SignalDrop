@@ -69,6 +69,14 @@ final class SettingsStore: ObservableObject {
         didSet { defaults.set(Int(pingPort), forKey: Keys.pingPort) }
     }
 
+    @Published var enabledVPNs: Set<String> = Set(VPNDefinition.allCurated.map(\.id)) {
+        didSet { defaults.set(Array(enabledVPNs), forKey: Keys.enabledVPNs) }
+    }
+
+    @Published var showMultiVPNWarning: Bool = true {
+        didSet { defaults.set(showMultiVPNWarning, forKey: Keys.showMultiVPNWarning) }
+    }
+
     private func loadSettings() {
         if defaults.object(forKey: Keys.launchAtLogin) != nil {
             launchAtLogin = defaults.bool(forKey: Keys.launchAtLogin)
@@ -115,6 +123,12 @@ final class SettingsStore: ObservableObject {
         if defaults.object(forKey: Keys.pingPort) != nil {
             pingPort = UInt16(defaults.integer(forKey: Keys.pingPort))
         }
+        if let vpnArray = defaults.array(forKey: Keys.enabledVPNs) as? [String] {
+            enabledVPNs = Set(vpnArray)
+        }
+        if defaults.object(forKey: Keys.showMultiVPNWarning) != nil {
+            showMultiVPNWarning = defaults.bool(forKey: Keys.showMultiVPNWarning)
+        }
     }
 
     private enum Keys {
@@ -133,5 +147,7 @@ final class SettingsStore: ObservableObject {
         static let showPing = "showPing"
         static let pingTarget = "pingTarget"
         static let pingPort = "pingPort"
+        static let enabledVPNs = "enabledVPNs"
+        static let showMultiVPNWarning = "showMultiVPNWarning"
     }
 }
