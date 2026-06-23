@@ -4,6 +4,8 @@ struct IPPingSettingsView: View {
     @ObservedObject var settingsStore: SettingsStore
     @ObservedObject var licenseManager: LicenseManager
 
+    private var isLocked: Bool { !licenseManager.isPaid }
+
     private let intervalOptions: [(String, TimeInterval)] = [
         ("30 seconds", 30),
         ("1 minute", 60),
@@ -13,31 +15,55 @@ struct IPPingSettingsView: View {
 
     var body: some View {
         Form {
-            if !licenseManager.isPaid {
-                HStack {
-                    Image(systemName: "lock.fill")
-                        .foregroundStyle(.secondary)
-                    Text(String(localized: "Upgrade to unlock IP & Latency features"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .accessibilityLabel(String(localized: "Paid feature. Upgrade to access IP and latency settings."))
+            if isLocked {
+                PaidFeatureNotice(
+                    icon: "globe",
+                    title: String(localized: "IP & Latency"),
+                    message: String(localized: "Upgrade to track your external IP and monitor network latency."),
+                    color: .purple
+                )
             }
 
             Section {
-                ipRefreshSettings
+                if isLocked {
+                    Group {
+                        lockedPicker(String(localized: "Refresh mode"), value: String(localized: "On demand"))
+                        lockedPicker(String(localized: "Refresh interval"), value: String(localized: "1 minute"))
+                    }
+                    .opacity(0.4)
+                } else {
+                    ipRefreshSettings
+                }
             } header: {
                 Text(String(localized: "External IP"))
             }
 
             Section {
-                pingSettings
+                if isLocked {
+                    Group {
+                        Toggle(String(localized: "Show ping latency"), isOn: .constant(false))
+                            .disabled(true)
+                        LabeledContent(String(localized: "Ping target")) {
+                            Text("1.1.1.1")
+                        }
+                    }
+                    .opacity(0.4)
+                } else {
+                    pingSettings
+                }
             } header: {
                 Text(String(localized: "Latency"))
             }
         }
-        .padding()
-        .disabled(!licenseManager.isPaid)
+        .formStyle(.grouped)
+    }
+
+    @ViewBuilder
+    private func lockedPicker(_ label: String, value: String) -> some View {
+        LabeledContent(label) {
+            Text(value)
+                .foregroundStyle(.secondary)
+        }
     }
 
     @ViewBuilder

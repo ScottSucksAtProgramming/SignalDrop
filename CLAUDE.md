@@ -74,7 +74,8 @@ wifi-menubar/
           VPNSettingsView.swift
           NotificationSettingsView.swift
           KeyboardShortcutsSettingsView.swift
-          UpdateSettingsView.swift
+          AboutView.swift
+          LicenseSettingsView.swift
         Onboarding/
     Resources/
       Info.plist

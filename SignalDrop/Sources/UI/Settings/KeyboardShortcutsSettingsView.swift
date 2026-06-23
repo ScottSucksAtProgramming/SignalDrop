@@ -7,51 +7,55 @@ struct KeyboardShortcutsSettingsView: View {
 
     var body: some View {
         Form {
-            if licenseManager.isPaid {
-                ForEach(HotkeyAction.allCases, id: \.rawValue) { action in
-                    HotkeyRow(
-                        action: action,
-                        binding: settingsStore.hotkeyBindings[action.rawValue],
-                        onSet: { binding in
-                            settingsStore.hotkeyBindings[action.rawValue] = binding
-                        },
-                        onClear: {
-                            settingsStore.hotkeyBindings.removeValue(forKey: action.rawValue)
-                        },
-                        conflictCheck: { binding in
-                            for (key, existing) in settingsStore.hotkeyBindings {
-                                guard let other = HotkeyAction(rawValue: key), other != action else { continue }
-                                if existing == binding { return other }
-                            }
-                            return nil
-                        }
-                    )
-                }
+            if !licenseManager.isPaid {
+                PaidFeatureNotice(
+                    icon: "keyboard",
+                    title: String(localized: "Keyboard Shortcuts"),
+                    message: String(localized: "Upgrade to control SignalDrop with global keyboard shortcuts."),
+                    color: .gray
+                )
+            }
 
-                Button(String(localized: "Reset to Defaults")) {
-                    settingsStore.hotkeyBindings = HotkeyAction.defaultBindings
+            Section(String(localized: "Shortcuts")) {
+                if licenseManager.isPaid {
+                    ForEach(HotkeyAction.allCases, id: \.rawValue) { action in
+                        HotkeyRow(
+                            action: action,
+                            binding: settingsStore.hotkeyBindings[action.rawValue],
+                            onSet: { binding in
+                                settingsStore.hotkeyBindings[action.rawValue] = binding
+                            },
+                            onClear: {
+                                settingsStore.hotkeyBindings.removeValue(forKey: action.rawValue)
+                            },
+                            conflictCheck: { binding in
+                                for (key, existing) in settingsStore.hotkeyBindings {
+                                    guard let other = HotkeyAction(rawValue: key), other != action else { continue }
+                                    if existing == binding { return other }
+                                }
+                                return nil
+                            }
+                        )
+                    }
+
+                    Button(String(localized: "Reset to Defaults")) {
+                        settingsStore.hotkeyBindings = HotkeyAction.defaultBindings
+                    }
+                    .accessibilityLabel(String(localized: "Reset all keyboard shortcuts to defaults"))
+                } else {
+                    Group {
+                        ForEach(HotkeyAction.allCases, id: \.rawValue) { action in
+                            LabeledContent(action.displayName) {
+                                Text(String(localized: "Not set"))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .opacity(0.4)
                 }
-                .accessibilityLabel(String(localized: "Reset all keyboard shortcuts to defaults"))
-            } else {
-                VStack(spacing: 8) {
-                    Image(systemName: "keyboard")
-                        .font(.largeTitle)
-                        .foregroundStyle(.secondary)
-                        .accessibilityHidden(true)
-                    Text(String(localized: "Keyboard shortcuts are a paid feature"))
-                        .font(.headline)
-                    Text(String(localized: "Upgrade to control SignalDrop with global keyboard shortcuts."))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(String(localized: "Keyboard shortcuts require a paid license"))
             }
         }
-        .padding()
+        .formStyle(.grouped)
     }
 }
 

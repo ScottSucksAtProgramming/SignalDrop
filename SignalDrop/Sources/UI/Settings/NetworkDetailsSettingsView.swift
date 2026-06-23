@@ -18,38 +18,59 @@ struct NetworkDetailsSettingsView: View {
             }
 
             Section {
-                advancedToggle(String(localized: "Band / Frequency"), isOn: $settingsStore.showBand)
-                    .accessibilityLabel(String(localized: "Show band and frequency"))
-                advancedToggle(String(localized: "Channel"), isOn: $settingsStore.showChannel)
-                    .accessibilityLabel(String(localized: "Show channel number"))
-                advancedToggle(String(localized: "Link speed"), isOn: $settingsStore.showLinkSpeed)
-                    .accessibilityLabel(String(localized: "Show link speed"))
-                advancedToggle(String(localized: "BSSID"), isOn: $settingsStore.showBSSID)
-                    .accessibilityLabel(String(localized: "Show BSSID"))
-                advancedToggle(String(localized: "DNS servers"), isOn: $settingsStore.showDNS)
-                    .accessibilityLabel(String(localized: "Show DNS servers"))
-                advancedToggle(String(localized: "Gateway"), isOn: $settingsStore.showGateway)
-                    .accessibilityLabel(String(localized: "Show gateway address"))
-                advancedToggle(String(localized: "Subnet mask"), isOn: $settingsStore.showSubnet)
-                    .accessibilityLabel(String(localized: "Show subnet mask"))
+                if isLocked {
+                    PaidFeatureNotice(
+                        icon: "network",
+                        title: String(localized: "Advanced Details"),
+                        message: String(localized: "Upgrade to see band, channel, link speed, BSSID, DNS, and more."),
+                        color: .green
+                    )
+
+                    Group {
+                        lockedToggle(String(localized: "Band / Frequency"))
+                        lockedToggle(String(localized: "Channel"))
+                        lockedToggle(String(localized: "Link speed"))
+                        lockedToggle(String(localized: "BSSID"))
+                        lockedToggle(String(localized: "DNS servers"))
+                        lockedToggle(String(localized: "Gateway"))
+                        lockedToggle(String(localized: "Subnet mask"))
+                    }
+                    .opacity(0.4)
+                } else {
+                    Toggle(String(localized: "Band / Frequency"), isOn: $settingsStore.showBand)
+                        .accessibilityLabel(String(localized: "Show band and frequency"))
+                    Toggle(String(localized: "Channel"), isOn: $settingsStore.showChannel)
+                        .accessibilityLabel(String(localized: "Show channel number"))
+                    Toggle(String(localized: "Link speed"), isOn: $settingsStore.showLinkSpeed)
+                        .accessibilityLabel(String(localized: "Show link speed"))
+                    Toggle(String(localized: "BSSID"), isOn: $settingsStore.showBSSID)
+                        .accessibilityLabel(String(localized: "Show BSSID"))
+                    Toggle(String(localized: "DNS servers"), isOn: $settingsStore.showDNS)
+                        .accessibilityLabel(String(localized: "Show DNS servers"))
+                    Toggle(String(localized: "Gateway"), isOn: $settingsStore.showGateway)
+                        .accessibilityLabel(String(localized: "Show gateway address"))
+                    Toggle(String(localized: "Subnet mask"), isOn: $settingsStore.showSubnet)
+                        .accessibilityLabel(String(localized: "Show subnet mask"))
+                }
             } header: {
                 HStack {
                     Text(String(localized: "Advanced Details"))
                     if isLocked {
                         Image(systemName: "lock.fill")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.orange)
                             .accessibilityLabel(String(localized: "Requires paid upgrade"))
                     }
                 }
             }
         }
-        .padding()
+        .formStyle(.grouped)
     }
 
     @ViewBuilder
-    private func advancedToggle(_ label: String, isOn: Binding<Bool>) -> some View {
-        Toggle(label, isOn: isOn)
-            .disabled(isLocked)
+    private func lockedToggle(_ label: String) -> some View {
+        Toggle(label, isOn: .constant(false))
+            .disabled(true)
+            .accessibilityLabel(String(localized: "\(label), locked"))
     }
 }

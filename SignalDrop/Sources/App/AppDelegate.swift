@@ -167,8 +167,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let window = NSWindow(contentViewController: hostingController)
         window.title = String(localized: "SignalDrop Settings")
-        window.styleMask = [.titled, .closable]
-        window.setContentSize(NSSize(width: 580, height: 300))
+        window.styleMask = [.titled, .closable, .resizable]
+        window.setContentSize(NSSize(width: 700, height: 450))
+        window.minSize = NSSize(width: 700, height: 450)
         window.center()
         window.isReleasedWhenClosed = false
         window.makeKeyAndOrderFront(nil)

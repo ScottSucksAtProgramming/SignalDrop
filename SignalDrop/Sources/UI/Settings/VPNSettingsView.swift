@@ -5,26 +5,65 @@ struct VPNSettingsView: View {
     @ObservedObject var settingsStore: SettingsStore
     @ObservedObject var licenseManager: LicenseManager
 
+    private var isLocked: Bool { !licenseManager.isPaid }
+
     var body: some View {
         Form {
-            if !licenseManager.isPaid {
-                paidOverlay
+            if isLocked {
+                PaidFeatureNotice(
+                    icon: "shield.lefthalf.filled",
+                    title: String(localized: "VPN Management"),
+                    message: String(localized: "Upgrade to customize VPN visibility, tap actions, and multi-VPN warnings."),
+                    color: .orange
+                )
+            }
+
+            if isLocked {
+                Section(String(localized: "Shown VPNs")) {
+                    Group {
+                        if vpnManager.vpnStates.isEmpty {
+                            Text(String(localized: "No VPNs configured in System Settings"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            ForEach(vpnManager.vpnStates) { vpnState in
+                                Toggle(vpnState.displayName, isOn: .constant(false))
+                                    .disabled(true)
+                            }
+                        }
+                    }
+                    .opacity(0.4)
+                }
+
+                Section {
+                    Group {
+                        LabeledContent(String(localized: "When a VPN is tapped")) {
+                            Text(String(localized: "Open the VPN app"))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .opacity(0.4)
+                }
+
+                Section {
+                    Group {
+                        Toggle(String(localized: "Show multi-VPN warning"), isOn: .constant(false))
+                            .disabled(true)
+                    }
+                    .opacity(0.4)
+                }
             } else {
                 vpnToggles
                 tapActionPicker
                 warningToggle
             }
         }
-        .padding()
+        .formStyle(.grouped)
     }
 
     @ViewBuilder
     private var vpnToggles: some View {
-        Section {
-            Text(String(localized: "Shown VPNs"))
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
-
+        Section(String(localized: "Shown VPNs")) {
             if vpnManager.vpnStates.isEmpty {
                 Text(String(localized: "No VPNs configured in System Settings"))
                     .font(.caption)
@@ -65,27 +104,5 @@ struct VPNSettingsView: View {
             Toggle(String(localized: "Show multi-VPN warning"), isOn: $settingsStore.showMultiVPNWarning)
                 .accessibilityLabel(String(localized: "Show warning when multiple VPNs are active"))
         }
-    }
-
-    @ViewBuilder
-    private var paidOverlay: some View {
-        VStack(spacing: 12) {
-            Toggle(String(localized: "Show VPNs in the popover"), isOn: .constant(true))
-                .disabled(true)
-            Toggle(String(localized: "Show multi-VPN warning"), isOn: .constant(true))
-                .disabled(true)
-        }
-        .opacity(0.5)
-        .overlay(alignment: .bottom) {
-            HStack(spacing: 4) {
-                Image(systemName: "lock.fill")
-                    .font(.caption2)
-                Text(String(localized: "VPN settings require a paid license"))
-                    .font(.caption2)
-            }
-            .foregroundStyle(.secondary)
-            .padding(.top, 8)
-        }
-        .accessibilityLabel(String(localized: "VPN settings are a paid feature"))
     }
 }
