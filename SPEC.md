@@ -121,28 +121,28 @@ App keeps working forever at the last installed version.
 ## VPN Management
 
 ### Supported VPNs
-- **V1 curated VPNs:** WireGuard, Tailscale, Private Internet Access
-- **Curated library:** Growing list of popular VPN apps with pre-configured CLI commands (Mullvad, NordVPN, ExpressVPN, ProtonVPN, etc.)
-- **Custom VPNs:** Deferred to V1.x (post-launch). Users can request additional VPN support via a GitHub issue template.
+- **Any VPN with a system profile** — auto-discovers all VPN configurations visible in System Settings > VPN
+- Works with WireGuard, Tailscale, PIA, Mullvad, NordVPN, corporate VPNs, and any other VPN app that registers a Network Extension profile
+- No curated list to maintain — if the OS sees it, SignalDrop sees it
 
 ### VPN Controls
 - Simple on/off toggle for each VPN
-- Status indicator (connected/disconnected/error)
-- CLI-based toggling:
-  - WireGuard: `wg-quick up/down` or app CLI
-  - Tailscale: `tailscale up/down`
-  - PIA: `piactl connect/disconnect`
+- Status indicator (connected/connecting/disconnecting/disconnected)
+- Provider-specific icons for recognized VPN apps (e.g., Tailscale, WireGuard), generic shield icon for unrecognized providers
+- Connect/disconnect via `NEVPNConnection.startVPNTunnel()` / `.stopVPNTunnel()`
 
-### VPN Execution Model
-Two-tier execution to minimize privilege exposure:
-- **Non-elevated commands** (`tailscale`, `piactl`) run directly from the main app process.
-- **Elevated commands** (`wg-quick`) run through the PrivilegedHelper, which maintains a hardcoded whitelist of permitted commands and arguments. The helper never executes arbitrary shell strings — all commands use argv arrays.
+### VPN Implementation
+Uses Apple's Network Extension framework (`NEVPNManager` / `NETunnelProviderManager`):
+- **Discovery:** `NETunnelProviderManager.loadAllFromPreferences()` returns all system VPN profiles
+- **Status monitoring:** Real-time via `NEVPNStatusDidChange` notification (no polling)
+- **Configuration changes:** `NEVPNConfigurationChange` notification triggers automatic VPN list reload
+- **Provider identification:** `NETunnelProviderProtocol.providerBundleIdentifier` maps to known VPN provider icons
+- **No CLI commands, no privileged helper** — the OS handles all privilege escalation natively
 
 ### VPN Detection
-- Auto-detect installed VPNs on first launch
-- User confirms which to monitor
-- User can add additional VPNs at any time
-- Grayed out with warning icon if VPN CLI is not found/uninstalled
+- Auto-detect all system VPN profiles at launch and when configurations change
+- User chooses which to show/hide in settings
+- New VPN apps appear automatically after installation — no restart required
 
 ---
 
@@ -208,10 +208,9 @@ All hotkeys are user-configurable:
 - IP refresh interval (if timed)
 
 ### VPN Management
-- Enable/disable monitored VPNs
-- Add VPN from curated list
+- Enable/disable monitored VPNs (show/hide per VPN in popover)
 - Multiple VPN warning toggle
-- (Custom VPN support deferred to V1.x)
+- VPN list auto-populates from system VPN profiles
 
 ### Notifications
 - Individual toggle for each notification type
@@ -240,7 +239,7 @@ All hotkeys are user-configurable:
 
 ## Security & Privacy
 
-- **Privileged helper** installed via `SMAppService` for VPN CLI commands requiring elevated privileges. User authorizes once during setup. Helper verifies the caller's code signature via audit token before executing any command. Commands are executed via argv arrays (never shell strings). An uninstall flow is available in settings.
+- **VPN management via Network Extension framework** — no privileged helper, no CLI commands. The OS handles all VPN connection management and privilege escalation natively through `NEVPNManager`.
 - **No data logging.** All network info is in-memory only, never written to disk.
 - **Opt-in crash reporting** via Sentry (V1.1+). Off by default; consent dialog shown per-crash.
 - **External IP fetched via DNS query only** (Cloudflare / OpenDNS). No HTTPS API calls for IP lookup.
@@ -253,11 +252,9 @@ All hotkeys are user-configurable:
 1. Welcome screen introducing SignalDrop
 2. Permission setup wizard:
    - Location Services (required for Wi-Fi SSID)
-   - Privileged helper installation (for VPN toggling)
-3. Auto-detect installed VPNs, present for user confirmation
-4. Option to add additional VPNs
-5. Configure menu bar display preferences
-6. Done - app is ready
+3. Auto-detect system VPN profiles, present for user confirmation of which to show
+4. Configure menu bar display preferences
+5. Done - app is ready
 
 ---
 
@@ -282,10 +279,9 @@ All hotkeys are user-configurable:
 
 ## Error Handling
 
-- **Missing VPN CLI:** Entry shown grayed out with warning icon and tooltip
+- **No VPNs found:** Helpful message directing users to set up a VPN in System Settings or install a VPN app
 - **Network state changes:** Real-time via `NWPathMonitor` (no polling)
 - **External IP fetch failure:** Shows "Unavailable" with retry button
-- **Privileged helper failure:** "Reinstall Helper" option in settings
 - **Principle:** Never silently fail. Always give the user a clear path to fix it.
 
 ---

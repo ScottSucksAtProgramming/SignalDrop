@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct VPNSectionView: View {
     @ObservedObject var vpnManager: VPNManager
@@ -23,15 +24,20 @@ struct VPNSectionView: View {
 
     @ViewBuilder
     private var vpnList: some View {
-        let enabledStates = vpnManager.vpnStates.filter { settingsStore.enabledVPNs.contains($0.id) }
+        let visibleStates = vpnManager.vpnStates.filter { !settingsStore.hiddenVPNs.contains($0.id) }
 
-        if enabledStates.isEmpty {
+        if vpnManager.vpnStates.isEmpty {
             Text(String(localized: "No VPNs configured"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .accessibilityLabel(String(localized: "No VPNs configured"))
+        } else if visibleStates.isEmpty {
+            Text(String(localized: "All VPNs hidden — check Settings to show them"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .accessibilityLabel(String(localized: "All VPNs are hidden in Settings"))
         } else {
-            ForEach(enabledStates) { vpnState in
+            ForEach(visibleStates) { vpnState in
                 vpnRow(for: vpnState)
             }
 
@@ -43,52 +49,36 @@ struct VPNSectionView: View {
 
     @ViewBuilder
     private func vpnRow(for vpnState: VPNState) -> some View {
-        HStack {
-            Circle()
-                .fill(statusColor(for: vpnState.status))
-                .frame(width: 8, height: 8)
-                .accessibilityHidden(true)
+        Button {
+            handleTap(vpnState)
+        } label: {
+            HStack {
+                Circle()
+                    .fill(statusColor(for: vpnState.status))
+                    .frame(width: 8, height: 8)
+                    .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(vpnState.definition.displayName)
+                Image(systemName: vpnState.iconName)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+
+                Text(vpnState.displayName)
                     .font(.caption)
 
-                if !vpnState.isCLIInstalled {
-                    Text(String(localized: "CLI not found"))
-                        .font(.caption2)
-                        .foregroundStyle(.red)
-                }
-            }
+                Spacer()
 
-            Spacer()
-
-            if vpnState.isCLIInstalled {
-                if vpnState.status == .connecting {
-                    ProgressView()
-                        .controlSize(.small)
-                        .accessibilityLabel(String(localized: "\(vpnState.definition.displayName) connecting"))
-                } else {
-                    Toggle("", isOn: Binding(
-                        get: { vpnState.status == .connected },
-                        set: { newValue in
-                            if newValue {
-                                vpnManager.connect(vpnID: vpnState.id)
-                            } else {
-                                vpnManager.disconnect(vpnID: vpnState.id)
-                            }
-                        }
-                    ))
-                    .toggleStyle(.switch)
-                    .controlSize(.small)
-                    .labelsHidden()
-                    .disabled(vpnState.definition.executionTier == .elevated)
-                    .accessibilityLabel(String(localized: "\(vpnState.definition.displayName) VPN toggle"))
-                    .accessibilityValue(vpnState.status == .connected ? String(localized: "Connected") : String(localized: "Disconnected"))
-                }
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
             }
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(vpnAccessibilityLabel(for: vpnState))
+        .accessibilityHint(String(localized: "Opens VPN controls"))
     }
 
     @ViewBuilder
@@ -119,25 +109,44 @@ struct VPNSectionView: View {
         .accessibilityLabel(String(localized: "VPN management is a paid feature"))
     }
 
+    private func handleTap(_ vpnState: VPNState) {
+        switch settingsStore.vpnTapAction {
+        case .openApp:
+            if let bundleID = vpnState.providerBundleIdentifier,
+               let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
+                NSWorkspace.shared.openApplication(at: appURL, configuration: NSWorkspace.OpenConfiguration())
+            } else {
+                openSystemVPNSettings()
+            }
+        case .openSystemSettings:
+            openSystemVPNSettings()
+        }
+    }
+
+    private func openSystemVPNSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
     private func statusColor(for status: VPNConnectionStatus) -> Color {
         switch status {
         case .connected: return .green
         case .connecting: return .yellow
+        case .disconnecting: return .orange
         case .disconnected: return .red
         case .unknown: return .gray
         }
     }
 
     private func vpnAccessibilityLabel(for vpnState: VPNState) -> String {
-        if !vpnState.isCLIInstalled {
-            return String(localized: "\(vpnState.definition.displayName): CLI not found")
-        }
         let statusText: String = switch vpnState.status {
         case .connected: String(localized: "connected")
-        case .disconnected: String(localized: "disconnected")
         case .connecting: String(localized: "connecting")
+        case .disconnecting: String(localized: "disconnecting")
+        case .disconnected: String(localized: "disconnected")
         case .unknown: String(localized: "unknown status")
         }
-        return "\(vpnState.definition.displayName): \(statusText)"
+        return "\(vpnState.displayName): \(statusText)"
     }
 }

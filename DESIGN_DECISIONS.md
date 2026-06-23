@@ -37,20 +37,19 @@ Features are more important than App Store presence. Many successful Mac utiliti
 
 ## Q4: VPN Protocols/Clients
 
-**Decision:** Support WireGuard, Tailscale, and Private Internet Access as primary. Curated library of popular VPNs. Custom VPN support for power users.
+**Decision (updated 2026-06-23):** Auto-discover all system VPN profiles via Apple's Network Extension framework. No curated list — any VPN visible in System Settings > VPN is supported.
 
-**Scott's setup:** Uses WireGuard and Tailscale regularly. PIA installed but used rarely.
+**Scott's setup:** Uses WireGuard (config named "Rivendell") and Tailscale regularly.
+
+**Original decision:** Curated list of WireGuard, Tailscale, PIA with CLI commands. **Replaced** because CLI toggling didn't work — users manage VPNs through their apps, which register system profiles, not through CLI tools.
 
 ---
 
 ## Q5: VPN Toggle Behavior
 
-**Decision:** Simple on/off toggles for all VPNs via CLI commands.
-- WireGuard: `wg-quick up/down` or app CLI
-- Tailscale: `tailscale up/down`
-- PIA: `piactl connect/disconnect`
+**Decision (updated 2026-06-23):** Simple on/off toggles for all VPNs via Network Extension framework (`NEVPNConnection.startVPNTunnel()` / `.stopVPNTunnel()`). No CLI commands.
 
-**Why:** Scott uses the apps to toggle today but is comfortable with CLI. Simple toggle is the v1 need. Exit node selection (Tailscale) and server selection (PIA) deferred to v2.
+**Why:** The original CLI-based approach (wg-quick, tailscale, piactl) didn't work in practice — VPN apps manage connections through system profiles, not CLI tools. Network Extension is the OS-native way to interact with VPN configurations. It's simpler, works with any VPN app, and eliminates the privileged helper entirely.
 
 ---
 
@@ -151,23 +150,21 @@ Auto-refresh on VPN state change regardless of mode. 30-second cache to avoid lo
 
 ## Q15: Data Persistence and First Run
 
-**Decision:**
+**Decision (updated 2026-06-23):**
 - Settings stored in UserDefaults (standard macOS approach)
-- Auto-detect installed VPNs on first launch, user confirms
-- User can add VPNs not detected (from curated list or custom)
-- First-run setup wizard walks through Location Services permission and privileged helper installation
+- Auto-discover all system VPN profiles via Network Extension, user chooses which to show
+- New VPN apps appear automatically after installation — no manual add needed
+- First-run setup wizard walks through Location Services permission (no privileged helper step — eliminated with Network Extension)
 
 ---
 
 ## Q16: Custom VPN Support
 
-**Decision:** Two approaches:
-1. Curated list of popular VPN apps with pre-configured CLI commands (checkbox to enable)
-2. Advanced/custom option: user provides name + shell commands for status check, connect, disconnect
+**Decision (updated 2026-06-23):** No curated list or custom VPN support needed for V1. The Network Extension framework auto-discovers all system VPN profiles. Any VPN app that registers a system profile (which is all major VPN apps) works automatically.
 
-V1 ships with curated-only support (WireGuard, Tailscale, PIA). Custom VPN support is deferred to V1.x. A "Request a VPN" button in the app opens a GitHub issue template. When custom VPN support ships in V1.x, it will be limited to non-elevated commands only — no privileged helper access for custom commands.
+Custom VPN configurations (user-defined profiles) may be revisited in a future version if there's demand.
 
-**Why:** Approachable for most users, extensible for power users. Curated list grows over time. Restricting custom commands to the non-elevated tier keeps the security surface minimal while the feature matures.
+**Original decision:** Curated CLI list + custom CLI commands. **Replaced** by auto-discovery via Network Extension — the entire problem of "which VPNs to support" is solved by the OS.
 
 ---
 
@@ -337,25 +334,21 @@ Paid: VPN monitoring/toggles, external IP, custom VPNs, configurable menu bar di
 
 ## Q34: VPN Execution Model
 
-**Decision:** Two-tier execution. Non-elevated VPN commands (`tailscale up/down`, `piactl connect/disconnect`) run directly from the main app process. Elevated commands (`wg-quick up/down`) run through the PrivilegedHelper with a hardcoded whitelist. Custom VPN commands (V1.x) will only be allowed at the non-elevated tier.
+**Decision (updated 2026-06-23):** Network Extension framework handles all VPN operations. No CLI commands, no privileged helper. `NEVPNConnection.startVPNTunnel()` and `.stopVPNTunnel()` manage connections; the OS handles privilege escalation natively.
 
-**Why:** Most VPN CLIs don't need sudo. Splitting tiers keeps the security surface minimal while supporting the common case without the helper.
+**Original decision:** Two-tier CLI execution (non-elevated + PrivilegedHelper for wg-quick). **Replaced** because CLI toggling didn't work with app-managed VPN configurations, and the privileged helper added significant complexity for a problem the OS already solves.
 
 ---
 
 ## Q35: Privileged Helper Security
 
-**Decision:** Helper verifies caller's code signature via audit token and designated requirement. Commands executed via argv arrays (`posix_spawn`/`NSTask`), never shell strings. Only hardcoded whitelisted binaries are allowed.
-
-**Why:** Without caller verification, any local process could invoke the helper to run elevated commands. Shell string execution enables argument injection even with a whitelist.
+**Decision (updated 2026-06-23):** ~~Privileged helper with audit token verification and command whitelist.~~ **Eliminated.** Network Extension framework removes the need for a privileged helper entirely. No elevated CLI commands, no XPC service, no daemon process.
 
 ---
 
 ## Q36: Helper Uninstall Flow
 
-**Decision:** Provide an in-app "Uninstall Helper" button that calls `SMAppService.unregister()`. Document manual removal steps for users. Helper must not survive app uninstallation without user knowledge.
-
-**Why:** `SMAppService` daemons persist after dragging the app to Trash. A privacy-focused utility leaving a root daemon is a bad look and generates support tickets.
+**Decision (updated 2026-06-23):** ~~In-app uninstall button for SMAppService helper.~~ **Eliminated.** No helper to install or uninstall.
 
 ---
 
@@ -379,7 +372,7 @@ Paid: VPN monitoring/toggles, external IP, custom VPNs, configurable menu bar di
 
 **Decision:** `.dmg` (drag to Applications). No `.pkg` installer for V1.
 
-**Why:** Simplest distribution for a menu bar utility. The privileged helper is registered via `SMAppService` at first launch, not via a `.pkg` installer. Standard for indie Mac apps.
+**Why:** Simplest distribution for a menu bar utility. No installer needed — VPN management uses the Network Extension framework, which requires no privileged helper or daemon registration. Standard for indie Mac apps.
 
 ---
 
@@ -396,3 +389,28 @@ Paid: VPN monitoring/toggles, external IP, custom VPNs, configurable menu bar di
 **Decision:** TCP-based latency measurement via `NWConnection` to `1.1.1.1:443` instead of ICMP ping.
 
 **Why:** ICMP ping requires raw sockets, which need either root access or a special entitlement that Apple doesn't easily grant for Developer ID apps. TCP connection latency gives an accurate, practical measurement without special permissions. UI still labels it "Ping."
+
+---
+
+## Q42: VPN Architecture — Read-Only Status + Deep-Link (2026-06-23, revised)
+
+> Replaces original Q42 (Network Extension rework), Q43 (NE notifications), Q44 (NE-based icons).
+
+**Decision:** VPN feature is **read-only status display with deep-link**. SignalDrop discovers system VPN profiles via `scutil --nc list` (SystemConfiguration), shows their name/status/provider icon, and deep-links to the owning app or System Settings on click. No toggling, no Network Extension, no CLI control.
+
+**What changed:**
+- **Deleted:** VPNDefinition, ProcessCommandExecutor, VPNCommandExecuting, ShellExecuting, HelperConstants, PrivilegedHelperManager, PrivilegedHelper target, MockVPNCommandExecutor
+- **New:** VPNState (model), VPNConfigurationProviding (protocol seam), SystemVPNProvider (scutil parser), MockVPNConfigurationProvider
+- **Rewritten:** VPNManager (refresh-only, no connect/disconnect), VPNSectionView (deep-link rows), VPNSettingsView (show/hide + tap-action picker), SettingsStore (hiddenVPNs + vpnTapAction)
+
+**Why:** Two discovery/control approaches failed:
+1. CLI-based (original Phase 4) — VPN apps register system profiles via Network Extension, not CLI tools; CLI toggling was unreliable.
+2. Network Extension (`NETunnelProviderManager.loadAllFromPreferences()`) — returns only configs the calling app created. SignalDrop creates none, so the result is empty. No entitlement grants cross-app visibility. This is macOS sandboxing by design.
+
+`scutil --nc list` reads SystemConfiguration, which does see all system VPN profiles (confirmed on real hardware: "Rivendell" WireGuard + Tailscale both visible with UUID, status, and provider bundle ID). Read-only is the honest scope; deep-linking to the owning app gives users one-click access to toggle.
+
+**Tradeoffs:**
+- Cannot toggle VPNs — users must click through to the app or System Settings
+- Status refresh is on-demand (popover open / app launch), not real-time push. Live updates (SCDynamicStore) deferred as a future nicety.
+- VPN identifier uses SCNetworkService UUID (survives config renames, unlike localizedDescription)
+- Tap-action is user-configurable: "open the VPN app" (default, falls back to System Settings if unknown) or "open System Settings"

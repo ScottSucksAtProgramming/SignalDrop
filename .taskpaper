@@ -18,35 +18,34 @@ Parallel Business Tasks — Start During Early Phases:
 
 Phase 4 — VPN:
 	Branch: phase/4-vpn
-	- Implement PrivilegedHelper — XPC service via SMAppService (building on Phase 1 spike)
-	- Implement XPC caller verification via audit token and designated requirement
-	- Implement command whitelist — hardcoded curated VPN binaries only
-	- Implement argv-based command execution (posix_spawn/NSTask, never shell strings)
-	- Implement helper installation flow with user authorization
-	- Implement helper verification and "Reinstall Helper" option
-	- Implement helper uninstall flow — "Uninstall Helper" button (SMAppService.unregister)
-	- Document manual helper removal steps for users
-	- Implement VPNManager — registry of VPNDefinition objects for curated VPNs
-	- Implement VPN auto-detection on first launch (check for wg-quick, tailscale, piactl binaries)
-	- Implement two-tier execution: non-elevated commands (tailscale, piactl) from main app, elevated (wg-quick) through helper
-	- Implement VPN status monitoring and observable per-VPN connection state
-	- Implement VPN connect/disconnect toggling via CLI commands
+	Architecture: Network Extension framework (NEVPNManager/NETunnelProviderManager) — replaces CLI-based approach
+	Rework Tasks (replaces original CLI/helper implementation):
+	- Delete CLI/helper infrastructure: VPNDefinition.swift, ProcessCommandExecutor.swift, VPNCommandExecuting.swift, HelperConstants.swift, PrivilegedHelperManager.swift, PrivilegedHelper/ target, MockVPNCommandExecutor.swift
+	- Remove PrivilegedHelper target from project.yml
+	- Implement VPNConfigurationProviding protocol — abstraction over NETunnelProviderManager for testability
+	- Rewrite VPNManager — auto-discover system VPN profiles via NETunnelProviderManager.loadAllFromPreferences()
+	- Implement real-time VPN status monitoring via NEVPNStatusDidChange notification (replace 10s polling)
+	- Implement VPN configuration change detection via NEVPNConfigurationChange notification
+	- Implement VPN connect/disconnect via NEVPNConnection.startVPNTunnel() / stopVPNTunnel()
+	- Implement VPN provider icon mapping via NETunnelProviderProtocol.providerBundleIdentifier
+	- Simplify VPNState — wrap NEVPNManager with displayName, status, isEnabled, provider icon
 	- Gate VPN features behind LicenseManager.isPaid
-	- Implement VPN section in popover — name, status indicator (connected/disconnected/error), toggle switch per VPN
-	- Implement grayed-out state with warning icon for missing VPN CLIs
-	- Implement multiple VPN warning (dismissable, can be disabled in settings)
-	- Implement "Request a VPN" button — opens pre-filled GitHub issue template in browser
-	- Wire IPService auto-refresh to VPN state changes
-	- Add Settings tab: VPN management (enable/disable monitored VPNs, multiple VPN warning toggle)
-	- Write unit tests for PrivilegedHelper (command whitelisting, XPC protocol, error handling)
-	- Write unit tests for VPNManager (auto-detection, status parsing, connect/disconnect, registry management)
+	- Update VPNSectionView — remove CLI warnings, add provider icons, status dot colors for all NEVPNStatus states
+	- Update VPNSettingsView — remove "Request a VPN" button, simplify to show/hide toggles + multi-VPN warning toggle
+	- Update SettingsStore — use localizedDescription as VPN identifier for enabledVPNs persistence
+	- Wire IPService auto-refresh to VPN state changes (via NEVPNStatusDidChange)
+	- Update AppDelegate — replace CLI-based VPN wiring with Network Extension setup
+	- Add NetworkExtension framework to project.yml
+	- Try without com.apple.developer.networking.vpn.api entitlement first (app is unsandboxed)
+	- Write unit tests for VPNManager (discovery, status mapping, connect/disconnect, enabled filtering, multi-VPN warning)
+	- Implement MockVPNConfigurationProvider for tests
 	- Add VoiceOver accessibility labels to all Phase 4 UI elements
 	- All user-facing strings use String(localized:)
-	- Update .taskpaper with any discoveries or adjustments
-	- Manual test against PRD user stories 16-20 (VPN management)
-	- Manual test against PRD user stories 45, 48 (VPN configuration)
+	- Update CLAUDE.md tree with file changes
+	- Manual test against PRD user stories 16-19 (VPN management — story 20 obsolete)
+	- Manual test against PRD user stories 45, 48 (VPN configuration — stories 46, 47, 47a obsolete)
 	- Manual test: VPN state change triggers external IP refresh
-	- Scott tests with real WireGuard, Tailscale, PIA setup (Scott) @tags(scott)
+	- Scott tests with real WireGuard, Tailscale setup (Scott) @tags(scott)
 	- Regression test: all Phase 1-3 user stories
 
 Phase 5a — Notifications + Hotkeys:
@@ -122,7 +121,7 @@ Phase 7 — Onboarding + Accessibility Audit:
 	- Implement first-run detection (check for first launch flag in UserDefaults)
 	- Implement OnboardingView — welcome screen introducing SignalDrop
 	- Implement setup wizard step: Location Services explanation and permission request
-	- Implement setup wizard step: privileged helper installation with user authorization
+	- (Removed — privileged helper no longer needed with Network Extension framework)
 	- Implement setup wizard step: auto-detect installed VPNs, present for user confirmation
 	- Implement setup wizard step: configure menu bar display preferences
 	- Implement setup wizard completion — app is ready
@@ -134,7 +133,7 @@ Phase 7 — Onboarding + Accessibility Audit:
 	- Edge case polish: Wi-Fi off state
 	- Edge case polish: missing VPN CLI (grayed out with warning icon and tooltip)
 	- Edge case polish: external IP fetch failure ("Unavailable" with retry)
-	- Edge case polish: privileged helper not installed or failed
+	- Edge case polish: no VPN profiles found (helpful message)
 	- Edge case polish: no networks available
 	- Edge case polish: very long network names (truncation)
 	- Edge case polish: empty VPN list

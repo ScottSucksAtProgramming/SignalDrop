@@ -31,31 +31,11 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-    dependencies:
-      - target: PrivilegedHelper
     entitlements:
       path: SignalDrop/Resources/SignalDrop.entitlements
       properties:
         com.apple.security.app-sandbox: false
         com.apple.security.network.client: true
-
-  PrivilegedHelper:
-    type: tool
-    platform: macOS
-    sources:
-      - path: PrivilegedHelper
-        excludes:
-          - "*.plist"
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.scottkostolni.SignalDrop.PrivilegedHelper
-        INFOPLIST_FILE: PrivilegedHelper/Info.plist
-        SKIP_INSTALL: YES
-        PRODUCT_NAME: com.scottkostolni.SignalDrop.PrivilegedHelper
-        CODE_SIGN_STYLE: Automatic
-        ENABLE_HARDENED_RUNTIME: YES
-        SWIFT_VERSION: "6.0"
-        MACOSX_DEPLOYMENT_TARGET: "13.0"
 
   SignalDropTests:
     type: bundle.unit-test

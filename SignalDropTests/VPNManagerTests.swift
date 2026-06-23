@@ -3,12 +3,6 @@ import Combine
 @testable import SignalDrop
 
 final class VPNManagerTests: XCTestCase {
-    private var cancellables = Set<AnyCancellable>()
-
-    override func tearDown() {
-        cancellables.removeAll()
-        super.tearDown()
-    }
 
     private func makePaidLicense() -> LicenseManager {
         let license = LicenseManager()
@@ -16,257 +10,183 @@ final class VPNManagerTests: XCTestCase {
         return license
     }
 
-    // MARK: - Detection
-
-    func testDetectInstalledVPNsFindsExistingCLIs() {
-        let executor = MockVPNCommandExecutor()
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: LicenseManager(),
-            fileExistsChecker: { path in
-                path == "/opt/homebrew/bin/tailscale"
-            }
-        )
-
-        sut.detectInstalledVPNs()
-
-        XCTAssertEqual(sut.vpnStates.count, 1)
-        XCTAssertEqual(sut.vpnStates[0].detectedCLIPath, "/opt/homebrew/bin/tailscale")
-        XCTAssertTrue(sut.vpnStates[0].isCLIInstalled)
+    private func makeProvider(configs: [VPNConfigurationInfo] = []) -> MockVPNConfigurationProvider {
+        let provider = MockVPNConfigurationProvider()
+        provider.configurations = configs
+        return provider
     }
 
-    func testDetectInstalledVPNsMarksUninstalledCLIs() {
-        let executor = MockVPNCommandExecutor()
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: LicenseManager(),
-            fileExistsChecker: { _ in false }
-        )
+    private let sampleConfigs: [VPNConfigurationInfo] = [
+        VPNConfigurationInfo(
+            id: "F5F86763-7D4E-4F9E-8D76-F746957BDCEB",
+            displayName: "Rivendell",
+            status: .disconnected,
+            providerBundleIdentifier: "com.wireguard.macos"
+        ),
+        VPNConfigurationInfo(
+            id: "4D9D5222-38FB-46B5-B61B-09499DBB016B",
+            displayName: "Tailscale",
+            status: .connected,
+            providerBundleIdentifier: "io.tailscale.ipn.macsys"
+        ),
+    ]
 
-        sut.detectInstalledVPNs()
+    // MARK: - Discovery
 
-        XCTAssertEqual(sut.vpnStates.count, 1)
-        XCTAssertNil(sut.vpnStates[0].detectedCLIPath)
-        XCTAssertFalse(sut.vpnStates[0].isCLIInstalled)
+    func testRefreshPopulatesVPNStates() {
+        let sut = VPNManager(provider: makeProvider(configs: sampleConfigs), licenseManager: makePaidLicense())
+
+        sut.refresh()
+
+        XCTAssertEqual(sut.vpnStates.count, 2)
+        XCTAssertEqual(sut.vpnStates[0].displayName, "Rivendell")
+        XCTAssertEqual(sut.vpnStates[0].id, "F5F86763-7D4E-4F9E-8D76-F746957BDCEB")
+        XCTAssertEqual(sut.vpnStates[1].displayName, "Tailscale")
     }
 
-    // MARK: - Status Refresh
+    func testRefreshMapsProviderBundleID() {
+        let sut = VPNManager(provider: makeProvider(configs: sampleConfigs), licenseManager: makePaidLicense())
 
-    func testRefreshStatusParsesConnected() {
-        let executor = MockVPNCommandExecutor()
-        executor.results["/opt/homebrew/bin/tailscale"] = ShellResult(
-            output: "{\"BackendState\":\"Running\"}",
-            exitCode: 0
-        )
+        sut.refresh()
 
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: LicenseManager(),
-            fileExistsChecker: { $0 == "/opt/homebrew/bin/tailscale" }
-        )
-        sut.detectInstalledVPNs()
+        XCTAssertEqual(sut.vpnStates[0].providerBundleIdentifier, "com.wireguard.macos")
+        XCTAssertEqual(sut.vpnStates[1].providerBundleIdentifier, "io.tailscale.ipn.macsys")
+    }
 
-        let expectation = XCTestExpectation(description: "Status updates to connected")
-        var cancellable: AnyCancellable?
-        cancellable = sut.$vpnStates
-            .dropFirst()
-            .sink { states in
-                if states.first?.status == .connected {
-                    expectation.fulfill()
-                    cancellable?.cancel()
-                }
-            }
+    // MARK: - Status Mapping
 
-        sut.refreshAllStatuses()
-        wait(for: [expectation], timeout: 5)
+    func testRefreshMapsAllStatusCases() {
+        let configs: [VPNConfigurationInfo] = [
+            VPNConfigurationInfo(id: "1", displayName: "Connected", status: .connected, providerBundleIdentifier: nil),
+            VPNConfigurationInfo(id: "2", displayName: "Connecting", status: .connecting, providerBundleIdentifier: nil),
+            VPNConfigurationInfo(id: "3", displayName: "Disconnecting", status: .disconnecting, providerBundleIdentifier: nil),
+            VPNConfigurationInfo(id: "4", displayName: "Disconnected", status: .disconnected, providerBundleIdentifier: nil),
+            VPNConfigurationInfo(id: "5", displayName: "Unknown", status: .unknown, providerBundleIdentifier: nil),
+        ]
+        let sut = VPNManager(provider: makeProvider(configs: configs), licenseManager: makePaidLicense())
+
+        sut.refresh()
 
         XCTAssertEqual(sut.vpnStates[0].status, .connected)
-    }
-
-    func testRefreshStatusParsesDisconnected() {
-        let executor = MockVPNCommandExecutor()
-        executor.results["/opt/homebrew/bin/tailscale"] = ShellResult(
-            output: "{\"BackendState\":\"Stopped\"}",
-            exitCode: 0
-        )
-
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: LicenseManager(),
-            fileExistsChecker: { $0 == "/opt/homebrew/bin/tailscale" }
-        )
-        sut.detectInstalledVPNs()
-
-        let expectation = XCTestExpectation(description: "Status updates to disconnected")
-        var cancellable: AnyCancellable?
-        cancellable = sut.$vpnStates
-            .dropFirst()
-            .sink { states in
-                if states.first?.status == .disconnected {
-                    expectation.fulfill()
-                    cancellable?.cancel()
-                }
-            }
-
-        sut.refreshAllStatuses()
-        wait(for: [expectation], timeout: 5)
-
-        XCTAssertEqual(sut.vpnStates[0].status, .disconnected)
-    }
-
-    // MARK: - Connect / Disconnect
-
-    func testConnectExecutesCorrectCommand() {
-        let executor = MockVPNCommandExecutor()
-        executor.results["/opt/homebrew/bin/tailscale"] = ShellResult(output: "", exitCode: 0)
-
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: makePaidLicense(),
-            fileExistsChecker: { $0 == "/opt/homebrew/bin/tailscale" }
-        )
-        sut.detectInstalledVPNs()
-
-        let expectation = XCTestExpectation(description: "Connect completes")
-        sut.connect(vpnID: "tailscale") {
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 5)
-
-        let connectCalls = executor.executedCommands.filter { $0.args.contains("up") }
-        XCTAssertEqual(connectCalls.count, 1)
-        XCTAssertEqual(connectCalls[0].path, "/opt/homebrew/bin/tailscale")
-        XCTAssertEqual(connectCalls[0].args, ["up"])
-    }
-
-    func testDisconnectExecutesCorrectCommand() {
-        let executor = MockVPNCommandExecutor()
-        executor.results["/opt/homebrew/bin/tailscale"] = ShellResult(output: "", exitCode: 0)
-
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: makePaidLicense(),
-            fileExistsChecker: { $0 == "/opt/homebrew/bin/tailscale" }
-        )
-        sut.detectInstalledVPNs()
-
-        let expectation = XCTestExpectation(description: "Disconnect completes")
-        sut.disconnect(vpnID: "tailscale") {
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 5)
-
-        let disconnectCalls = executor.executedCommands.filter { $0.args.contains("down") }
-        XCTAssertEqual(disconnectCalls.count, 1)
-        XCTAssertEqual(disconnectCalls[0].path, "/opt/homebrew/bin/tailscale")
-        XCTAssertEqual(disconnectCalls[0].args, ["down"])
-    }
-
-    // MARK: - Guards
-
-    func testConnectBlockedWhenNotPaid() {
-        let executor = MockVPNCommandExecutor()
-        executor.results["/opt/homebrew/bin/tailscale"] = ShellResult(output: "", exitCode: 0)
-
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: LicenseManager(), // isPaid defaults to false
-            fileExistsChecker: { $0 == "/opt/homebrew/bin/tailscale" }
-        )
-        sut.detectInstalledVPNs()
-
-        let expectation = XCTestExpectation(description: "Connect completes (blocked)")
-        sut.connect(vpnID: "tailscale") {
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 5)
-
-        let connectCalls = executor.executedCommands.filter { $0.args.contains("up") }
-        XCTAssertTrue(connectCalls.isEmpty)
-    }
-
-    func testConnectNoopsWhenCLIMissing() {
-        let executor = MockVPNCommandExecutor()
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: executor,
-            licenseManager: makePaidLicense(),
-            fileExistsChecker: { _ in false }
-        )
-        sut.detectInstalledVPNs()
-
-        let expectation = XCTestExpectation(description: "Connect completes (no CLI)")
-        sut.connect(vpnID: "tailscale") {
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 5)
-
-        XCTAssertTrue(executor.executedCommands.isEmpty)
+        XCTAssertEqual(sut.vpnStates[1].status, .connecting)
+        XCTAssertEqual(sut.vpnStates[2].status, .disconnecting)
+        XCTAssertEqual(sut.vpnStates[3].status, .disconnected)
+        XCTAssertEqual(sut.vpnStates[4].status, .unknown)
     }
 
     // MARK: - Multiple Connected Warning
 
     func testMultipleVPNsConnectedWarning() {
-        let executor = MockVPNCommandExecutor()
-        executor.results["/opt/homebrew/bin/tailscale"] = ShellResult(
-            output: "{\"BackendState\":\"Running\"}",
-            exitCode: 0
-        )
-        executor.results["/usr/local/bin/piactl"] = ShellResult(
-            output: "Connected",
-            exitCode: 0
-        )
+        let configs: [VPNConfigurationInfo] = [
+            VPNConfigurationInfo(id: "1", displayName: "VPN A", status: .connected, providerBundleIdentifier: nil),
+            VPNConfigurationInfo(id: "2", displayName: "VPN B", status: .connected, providerBundleIdentifier: nil),
+        ]
+        let sut = VPNManager(provider: makeProvider(configs: configs), licenseManager: makePaidLicense())
 
-        let sut = VPNManager(
-            definitions: [.tailscale, .pia],
-            executor: executor,
-            licenseManager: LicenseManager(),
-            fileExistsChecker: { path in
-                path == "/opt/homebrew/bin/tailscale" || path == "/usr/local/bin/piactl"
-            }
-        )
-        sut.detectInstalledVPNs()
-
-        let expectation = XCTestExpectation(description: "Both VPNs report connected")
-        var cancellable: AnyCancellable?
-        cancellable = sut.$vpnStates
-            .dropFirst()
-            .sink { states in
-                let connectedCount = states.filter { $0.status == .connected }.count
-                if connectedCount >= 2 {
-                    expectation.fulfill()
-                    cancellable?.cancel()
-                }
-            }
-
-        sut.refreshAllStatuses()
-        wait(for: [expectation], timeout: 5)
+        sut.refresh()
 
         XCTAssertTrue(sut.hasMultipleConnected)
         XCTAssertEqual(sut.connectedCount, 2)
     }
 
-    // MARK: - setEnabled
+    func testSingleVPNConnectedNoWarning() {
+        let sut = VPNManager(provider: makeProvider(configs: sampleConfigs), licenseManager: makePaidLicense())
 
-    func testSetEnabledUpdatesState() {
-        let sut = VPNManager(
-            definitions: [.tailscale],
-            executor: MockVPNCommandExecutor(),
-            licenseManager: LicenseManager(),
-            fileExistsChecker: { $0 == "/opt/homebrew/bin/tailscale" }
-        )
-        sut.detectInstalledVPNs()
-        XCTAssertTrue(sut.vpnStates[0].isEnabled)
+        sut.refresh()
 
-        sut.setEnabled(vpnID: "tailscale", enabled: false)
+        XCTAssertFalse(sut.hasMultipleConnected)
+        XCTAssertEqual(sut.connectedCount, 1)
+    }
 
-        XCTAssertFalse(sut.vpnStates[0].isEnabled)
+    // MARK: - Paid Gate
+
+    func testRefreshReturnsEmptyWhenNotPaid() {
+        let license = LicenseManager()
+        license.isPaid = false
+        let sut = VPNManager(provider: makeProvider(configs: sampleConfigs), licenseManager: license)
+
+        sut.refresh()
+
+        XCTAssertTrue(sut.vpnStates.isEmpty)
+    }
+
+    func testRefreshClearsExistingStatesWhenNotPaid() {
+        let license = makePaidLicense()
+        let sut = VPNManager(provider: makeProvider(configs: sampleConfigs), licenseManager: license)
+        sut.refresh()
+        XCTAssertEqual(sut.vpnStates.count, 2)
+
+        license.isPaid = false
+        sut.refresh()
+
+        XCTAssertTrue(sut.vpnStates.isEmpty)
+    }
+
+    // MARK: - Provider Icon
+
+    func testProviderIconMapsKnownBundleIDs() {
+        XCTAssertEqual(VPNState.providerIcon(for: "com.wireguard.macos"), "shield.lefthalf.filled")
+        XCTAssertEqual(VPNState.providerIcon(for: "io.tailscale.ipn.macsys"), "network.badge.shield.half.filled")
+        XCTAssertEqual(VPNState.providerIcon(for: "io.tailscale.ipn.macos"), "network.badge.shield.half.filled")
+    }
+
+    func testProviderIconFallsBackForUnknown() {
+        XCTAssertEqual(VPNState.providerIcon(for: "com.example.unknown"), "lock.shield")
+        XCTAssertEqual(VPNState.providerIcon(for: nil), "lock.shield")
+    }
+
+    // MARK: - SystemVPNProvider.parse()
+
+    func testParseRealScutilOutput() {
+        let output = """
+        Available network connection services in the current set (*=enabled):
+        * (Disconnected)   F5F86763-7D4E-4F9E-8D76-F746957BDCEB VPN (com.wireguard.macos) "Rivendell"                      [VPN:com.wireguard.macos]
+        * (Disconnected)   4D9D5222-38FB-46B5-B61B-09499DBB016B VPN (io.tailscale.ipn.macsys) "Tailscale"                      [VPN:io.tailscale.ipn.macsys]
+        """
+
+        let results = SystemVPNProvider.parse(output)
+
+        XCTAssertEqual(results.count, 2)
+
+        XCTAssertEqual(results[0].id, "F5F86763-7D4E-4F9E-8D76-F746957BDCEB")
+        XCTAssertEqual(results[0].displayName, "Rivendell")
+        XCTAssertEqual(results[0].status, .disconnected)
+        XCTAssertEqual(results[0].providerBundleIdentifier, "com.wireguard.macos")
+
+        XCTAssertEqual(results[1].id, "4D9D5222-38FB-46B5-B61B-09499DBB016B")
+        XCTAssertEqual(results[1].displayName, "Tailscale")
+        XCTAssertEqual(results[1].status, .disconnected)
+        XCTAssertEqual(results[1].providerBundleIdentifier, "io.tailscale.ipn.macsys")
+    }
+
+    func testParseConnectedStatus() {
+        let output = """
+        * (Connected)   AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE VPN (com.example.vpn) "My VPN"  [VPN:com.example.vpn]
+        """
+
+        let results = SystemVPNProvider.parse(output)
+
+        XCTAssertEqual(results.count, 1)
+        XCTAssertEqual(results[0].status, .connected)
+    }
+
+    func testParseSkipsHeaderLine() {
+        let output = "Available network connection services in the current set (*=enabled):\n"
+
+        let results = SystemVPNProvider.parse(output)
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testParseHandlesAllStatusStrings() {
+        func lineWith(status: String) -> String {
+            "* (\(status))   AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE VPN (com.test) \"Test\"  [VPN:com.test]"
+        }
+
+        XCTAssertEqual(SystemVPNProvider.parse(lineWith(status: "Connected")).first?.status, .connected)
+        XCTAssertEqual(SystemVPNProvider.parse(lineWith(status: "Connecting")).first?.status, .connecting)
+        XCTAssertEqual(SystemVPNProvider.parse(lineWith(status: "Disconnecting")).first?.status, .disconnecting)
+        XCTAssertEqual(SystemVPNProvider.parse(lineWith(status: "Disconnected")).first?.status, .disconnected)
+        XCTAssertEqual(SystemVPNProvider.parse(lineWith(status: "SomethingElse")).first?.status, .unknown)
     }
 }

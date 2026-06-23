@@ -11,8 +11,8 @@ struct VPNSettingsView: View {
                 paidOverlay
             } else {
                 vpnToggles
+                tapActionPicker
                 warningToggle
-                requestButton
             }
         }
         .padding()
@@ -21,33 +21,41 @@ struct VPNSettingsView: View {
     @ViewBuilder
     private var vpnToggles: some View {
         Section {
-            Text(String(localized: "Monitored VPNs"))
+            Text(String(localized: "Shown VPNs"))
                 .font(.headline)
                 .accessibilityAddTraits(.isHeader)
 
-            ForEach(vpnManager.vpnStates) { vpnState in
-                HStack {
-                    Toggle(vpnState.definition.displayName, isOn: Binding(
-                        get: { settingsStore.enabledVPNs.contains(vpnState.id) },
-                        set: { enabled in
-                            if enabled {
-                                settingsStore.enabledVPNs.insert(vpnState.id)
+            if vpnManager.vpnStates.isEmpty {
+                Text(String(localized: "No VPNs configured in System Settings"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .accessibilityLabel(String(localized: "No VPNs configured in System Settings"))
+            } else {
+                ForEach(vpnManager.vpnStates) { vpnState in
+                    Toggle(vpnState.displayName, isOn: Binding(
+                        get: { !settingsStore.hiddenVPNs.contains(vpnState.id) },
+                        set: { shown in
+                            if shown {
+                                settingsStore.hiddenVPNs.remove(vpnState.id)
                             } else {
-                                settingsStore.enabledVPNs.remove(vpnState.id)
+                                settingsStore.hiddenVPNs.insert(vpnState.id)
                             }
-                            vpnManager.setEnabled(vpnID: vpnState.id, enabled: enabled)
                         }
                     ))
-                    .accessibilityLabel(String(localized: "Monitor \(vpnState.definition.displayName)"))
-
-                    if !vpnState.isCLIInstalled {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.yellow)
-                            .font(.caption)
-                            .accessibilityLabel(String(localized: "\(vpnState.definition.displayName) CLI not found"))
-                    }
+                    .accessibilityLabel(String(localized: "Show \(vpnState.displayName) in the popover"))
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var tapActionPicker: some View {
+        Section {
+            Picker(String(localized: "When a VPN is tapped"), selection: $settingsStore.vpnTapAction) {
+                Text(String(localized: "Open the VPN app")).tag(VPNTapAction.openApp)
+                Text(String(localized: "Open System Settings")).tag(VPNTapAction.openSystemSettings)
+            }
+            .accessibilityLabel(String(localized: "Choose what happens when you tap a VPN"))
         }
     }
 
@@ -60,26 +68,10 @@ struct VPNSettingsView: View {
     }
 
     @ViewBuilder
-    private var requestButton: some View {
-        Section {
-            Button {
-                if let url = URL(string: "https://github.com/ScottSucksAtProgramming/SignalDrop/issues/new?template=vpn_request.md") {
-                    NSWorkspace.shared.open(url)
-                }
-            } label: {
-                Label(String(localized: "Request a VPN"), systemImage: "plus.bubble")
-            }
-            .accessibilityLabel(String(localized: "Request support for a new VPN provider"))
-        }
-    }
-
-    @ViewBuilder
     private var paidOverlay: some View {
         VStack(spacing: 12) {
-            ForEach(VPNDefinition.allCurated) { def in
-                Toggle(def.displayName, isOn: .constant(true))
-                    .disabled(true)
-            }
+            Toggle(String(localized: "Show VPNs in the popover"), isOn: .constant(true))
+                .disabled(true)
             Toggle(String(localized: "Show multi-VPN warning"), isOn: .constant(true))
                 .disabled(true)
         }

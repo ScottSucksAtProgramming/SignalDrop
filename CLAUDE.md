@@ -25,13 +25,12 @@ wifi-menubar/
       Models/
         NetworkState.swift
         ScannedNetwork.swift
-        VPNDefinition.swift
+        VPNState.swift
       Protocols/
         NetworkPathProviding.swift
         WLANInterface.swift
-        ShellExecuting.swift
         WiFiScanning.swift
-        VPNCommandExecuting.swift
+        VPNConfigurationProviding.swift
       Services/
         NetworkMonitor/
           NetworkMonitor.swift
@@ -45,10 +44,7 @@ wifi-menubar/
           PingService.swift
         VPNManager/
           VPNManager.swift
-          ProcessCommandExecutor.swift
-        PrivilegedHelper/
-          HelperConstants.swift
-          PrivilegedHelperManager.swift
+          SystemVPNProvider.swift
         SettingsStore/
           SettingsStore.swift
         LicenseManager/
@@ -62,7 +58,7 @@ wifi-menubar/
           NetworkListView.swift
           PasswordInputView.swift
           IPPingView.swift
-tttttVPNSectionView.swift
+          VPNSectionView.swift
         Settings/
           SettingsView.swift
           NetworkDetailsSettingsView.swift
@@ -78,14 +74,11 @@ tttttVPNSectionView.swift
     WiFiManagerTests.swift
     IPServiceTests.swift
     PingServiceTests.swift
-ttVPNManagerTests.swift
+    VPNManagerTests.swift
     Mocks/
       MockWiFiScanner.swift
-tttMockVPNCommandExecutor.swift
-tPrivilegedHelper/
-ttmain.swift
-ttInfo.plist
-ttlaunchd.plist
+      MockVPNConfigurationProvider.swift
+
   archive/
     completed-phases.taskpaper
   handoffs/          (local only, .gitignored — session handoff docs)
@@ -162,7 +155,7 @@ ttlaunchd.plist
 1. **No data logging to disk.** All network info stays in-memory only. This is a core trust promise.
 2. **Crash reporting (Sentry) must never initialize unless the user has explicitly opted in.** No silent telemetry.
 3. **All external network calls must use HTTPS only.**
-4. **VPN CLI commands must only execute through the PrivilegedHelper** — never shell out directly from the main app process.
+4. **VPN status is read-only via SystemConfiguration** (`scutil --nc list`). SignalDrop cannot toggle other apps' VPN tunnels — macOS sandboxes Network Extension configs per-app. Clicking a VPN row deep-links to the owning app (or System Settings). No CLI-based control, no shell toggling, no privileged helper.
 5. **Paid features must be gated through LicenseManager** — never hardcode tier checks or scatter `if paid` logic through the codebase.
 6. **Follow the module boundaries in PRD.md.** Modules communicate through their public interfaces. Don't reach into another module's internals.
 
@@ -171,9 +164,9 @@ ttlaunchd.plist
 ### Unit / Integration Tests
 
 1. Test external behavior through each module's public interface, not implementation details.
-2. Use protocol-based dependency injection to mock system APIs (CoreWLAN, NWPathMonitor, shell execution).
+2. Use protocol-based dependency injection to mock system APIs (CoreWLAN, NWPathMonitor, NetworkExtension).
 3. No real network calls or VPN toggling in tests. All tests must be deterministic.
-4. Modules under test: NetworkMonitor, WiFiManager, VPNManager, PrivilegedHelper, IPService, PingService, HotkeyManager, NotificationService.
+4. Modules under test: NetworkMonitor, WiFiManager, VPNManager, IPService, PingService, HotkeyManager, NotificationService.
 
 ### Manual Testing (AI Agent)
 

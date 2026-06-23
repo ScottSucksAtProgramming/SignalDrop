@@ -27,8 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ipService.refreshLocalIP()
         ipService.observeSettings(settingsStore)
         observePingSettings()
-        vpnManager.detectInstalledVPNs()
-        vpnManager.startStatusPolling()
+        vpnManager.refresh()
         observeVPNStateChanges()
     }
 
@@ -170,7 +169,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             wifiManager.scan()
             ipService.refreshLocalIP()
             ipService.refreshExternalIP()
-            vpnManager.refreshAllStatuses()
+            vpnManager.refresh()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
         }

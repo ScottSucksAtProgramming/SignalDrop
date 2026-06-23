@@ -9,7 +9,7 @@ Everything defined in [SPEC.md](SPEC.md). Development tracked in [.taskpaper](.t
 1. **Walking Skeleton** — Xcode project, menu bar icon, popover, NetworkMonitor, SettingsStore, protocol-based DI, first tests
 2. **Wi-Fi Management** — WiFiManager, network list, switching, Wi-Fi toggle, Ethernet detection
 3. **IP + Ping** — IPService (DNS-based lookup), PingService (TCP-based latency), configurable refresh
-4. **VPN** — PrivilegedHelper (SMAppService), VPNManager, curated VPN support (WireGuard, Tailscale, PIA)
+4. **VPN** — VPNManager via Network Extension framework (NEVPNManager), auto-discovery of all system VPN profiles, real-time status, provider icons
 5. **Notifications + Hotkeys + Polish** — NotificationService, HotkeyManager, collapsible sections, configurable menu bar
 6. **Licensing + Updates** — LemonSqueezy SDK, Sparkle auto-updates, free/paid feature gating
 7. **Onboarding + Accessibility** — First-run wizard, accessibility audit, edge case polish
@@ -20,7 +20,7 @@ Everything defined in [SPEC.md](SPEC.md). Development tracked in [.taskpaper](.t
 - Menu bar icon with configurable display
 - SwiftUI popover with connection info, VPN toggles, network list
 - Wi-Fi network switching (known networks prioritized)
-- VPN monitoring and toggling (curated: WireGuard, Tailscale, PIA)
+- VPN monitoring and toggling (auto-discovers all system VPN profiles via Network Extension)
 - Local and external IP display (DNS-based lookup) with configurable refresh
 - Ethernet detection and display
 - Ping/latency indicator (TCP-based)
@@ -31,7 +31,7 @@ Everything defined in [SPEC.md](SPEC.md). Development tracked in [.taskpaper](.t
 - First-run setup wizard
 - Full accessibility support
 - Localization-ready (English only)
-- Privileged helper for elevated VPN commands (with caller verification and uninstall flow)
+- Provider-specific VPN icons for recognized VPN apps
 - Copy/export network info to clipboard
 
 ---
@@ -46,22 +46,12 @@ Everything defined in [SPEC.md](SPEC.md). Development tracked in [.taskpaper](.t
 
 ## v1.x - Post-Launch Improvements
 
-### Custom VPN Support
-- Non-elevated custom VPN commands (user provides name + CLI commands)
-- Custom commands run at user-level permissions only (no privileged helper)
+### Custom VPN Configurations
+- Allow users to create custom VPN profiles from within SignalDrop (if demand exists)
 
-### VPN Library Expansion
-- Add pre-configured CLI commands for popular VPN apps:
-  - Mullvad
-  - NordVPN
-  - ExpressVPN
-  - ProtonVPN
-  - Surfshark
-  - CyberGhost
-  - OpenVPN (generic)
-  - Cisco AnyConnect
-  - GlobalProtect
-- Community contributions welcome
+### VPN Enhancements
+- Expand provider icon library for more VPN apps
+- VPN leak detection (DNS leaks, IPv6 leaks, packet-level inspection) — far-future
 
 ### Polish
 - Bug fixes and performance improvements based on user feedback

@@ -34,7 +34,7 @@ SignalDrop is a lightweight macOS menu bar utility that consolidates Wi-Fi manag
 17. As a paid user, I want to toggle VPNs on and off with a single click, so that I don't have to open separate VPN apps.
 18. As a paid user, I want to see a warning when multiple VPNs are active simultaneously, so that I'm aware of potential routing conflicts.
 19. As a paid user, I want to disable the multiple-VPN warning, so that it doesn't bother me if I intentionally run multiple VPNs.
-20. As a paid user, I want to see a clear error state when a VPN CLI is not found, so that I know to reinstall or reconfigure.
+20. ~~As a paid user, I want to see a clear error state when a VPN CLI is not found, so that I know to reinstall or reconfigure.~~ *(Obsolete — VPNs are now discovered via macOS Network Extension framework, not CLI detection.)*
 
 ### Wi-Fi Network Switching
 21. As a user, I want to see a list of available Wi-Fi networks, so that I can choose which to connect to.
@@ -71,10 +71,10 @@ SignalDrop is a lightweight macOS menu bar utility that consolidates Wi-Fi manag
 44. As a paid user, I want to customize all keyboard shortcuts, so that they don't conflict with my other apps.
 
 ### VPN Configuration
-45. As a paid user, I want the app to auto-detect installed VPNs on first launch, so that setup is effortless.
-46. As a paid user, I want to add VPNs from a curated list of popular providers, so that I don't have to figure out CLI commands myself.
-47. As a paid user, I want to add custom VPNs by specifying CLI commands for status/connect/disconnect, so that I can use any VPN tool. *(Deferred to V1.x — V1 ships with curated VPNs only: WireGuard, Tailscale, PIA.)*
-47a. As a user who needs a VPN not on the curated list, I want to request support via a GitHub issue template, so that popular VPNs get added in a future update.
+45. As a paid user, I want the app to auto-detect all VPN configurations on my Mac, so that setup is effortless. *(Uses macOS Network Extension framework — discovers all system VPN profiles automatically.)*
+46. ~~As a paid user, I want to add VPNs from a curated list of popular providers, so that I don't have to figure out CLI commands myself.~~ *(Obsolete — all system VPN profiles are auto-discovered.)*
+47. ~~As a paid user, I want to add custom VPNs by specifying CLI commands for status/connect/disconnect, so that I can use any VPN tool.~~ *(Obsolete — replaced by auto-discovery. Custom VPN configurations may be revisited in a future version.)*
+47a. ~~As a user who needs a VPN not on the curated list, I want to request support via a GitHub issue template, so that popular VPNs get added in a future update.~~ *(Obsolete — auto-discovery supports any VPN that registers a system profile.)*
 48. As a paid user, I want to enable and disable which VPNs are monitored, so that I can hide ones I don't use.
 
 ### Settings
@@ -87,7 +87,7 @@ SignalDrop is a lightweight macOS menu bar utility that consolidates Wi-Fi manag
 
 ### First-Run Experience
 55. As a new user, I want a setup wizard that explains why Location Services is needed, so that I understand the permission prompt.
-56. As a new user, I want the app to walk me through installing the privileged helper, so that VPN toggling works from the start.
+56. ~~As a new user, I want the app to walk me through installing the privileged helper, so that VPN toggling works from the start.~~ *(Obsolete — Network Extension framework eliminates the need for a privileged helper.)*
 57. As a new user, I want the app to detect my installed VPNs and let me confirm which to monitor, so that setup is fast.
 58. As a new user, I want to configure my menu bar display preferences during setup, so that the app looks right immediately.
 
@@ -116,9 +116,7 @@ The app is structured around deep, independently testable modules with clean int
 
 2. **WiFiManager** — Handles Wi-Fi scanning and network switching via `CoreWLAN`. Scans for available networks, sorts them (known first, then by signal strength), joins known networks with one click, prompts for passwords on unknown networks, toggles Wi-Fi power on/off.
 
-3. **VPNManager** — Manages VPN detection, status monitoring, and toggling. Contains a registry of `VPNDefinition` objects (curated list with pre-configured CLI commands; custom entries deferred to V1.x). Uses a two-tier execution model: non-elevated commands (status checks) run directly from the main app process, while elevated commands (connect/disconnect) are dispatched through the PrivilegedHelper. Publishes observable per-VPN connection state. Handles auto-detection of installed VPNs on first run.
-
-4. **PrivilegedHelper** — An XPC service installed via `SMAppService`. Executes elevated shell commands on behalf of the main app, restricted to a hardcoded whitelist of approved VPN CLI commands. Verifies the caller's code signature via audit token before executing any command. Commands are passed as argv arrays — never interpolated shell strings — to prevent injection. Provides installation, verification, reinstallation, and uninstall flows (uninstall removes the helper and cleans up `SMAppService` registration).
+3. **VPNManager** — Manages VPN discovery, real-time status monitoring, and connect/disconnect toggling via Apple's Network Extension framework (`NEVPNManager` / `NETunnelProviderManager`). Auto-discovers all system VPN profiles (any VPN visible in System Settings > VPN). Monitors status changes in real-time via `NEVPNStatusDidChange` notifications and reloads the VPN list on `NEVPNConfigurationChange`. Identifies known VPN providers by `NETunnelProviderProtocol.providerBundleIdentifier` for provider-specific icons. Publishes observable per-VPN connection state. No CLI commands, no privileged helper — the OS handles all privilege escalation natively.
 
 5. **IPService** — Resolves local IP from network interfaces and fetches external IP via DNS-based lookup (Cloudflare DNS as primary, OpenDNS as fallback — no HTTPS API dependency). Supports two user-configurable refresh modes (timed interval, on-demand). Auto-refreshes when VPN state changes. Caches external IP for 30 seconds. Handles fetch failures gracefully.
 
@@ -142,8 +140,7 @@ The app is structured around deep, independently testable modules with clean int
 
 - **Real-time state via `NWPathMonitor`** — no polling for network changes. System notifications are instant and efficient.
 - **CoreWLAN for Wi-Fi operations** — direct API access for scanning, joining, and reading Wi-Fi details. Requires Location Services permission for SSID (Apple requirement on modern macOS).
-- **CLI-based VPN toggling** — shell commands executed via privileged helper. This supports the widest range of VPN apps without protocol-specific implementation.
-- **`SMAppService` for privileged helper** — Apple's blessed approach for installing helper tools. User authorizes once.
+- **Network Extension framework for VPN management** — uses `NEVPNManager` / `NETunnelProviderManager` to discover, monitor, and toggle all system VPN profiles. Real-time status via `NEVPNStatusDidChange` notifications. No CLI commands, no privileged helper — the OS handles privilege escalation natively. Works with any VPN app that registers a system profile (WireGuard, Tailscale, PIA, Mullvad, NordVPN, corporate VPNs, etc.).
 - **Sparkle for auto-updates** — standard macOS update framework. Update feed hosted as XML on GitHub Releases.
 - **LemonSqueezy for licensing** — merchant of record handles payment processing and global sales tax. Swift SDK for license validation.
 - **Sentry for crash reporting** — deferred to V1.1. When introduced, it will be opt-in only with a per-crash consent dialog; Sentry never initializes unless the user explicitly approves.
@@ -167,9 +164,7 @@ Tests should verify external behavior through each module's public interface, no
 
 2. **WiFiManager** — Test network list sorting (known first, then by signal strength), join flow (known vs. unknown), and Wi-Fi power toggle. Mock `CoreWLAN` interfaces.
 
-3. **VPNManager** — Test VPN auto-detection logic, status parsing from CLI output, connect/disconnect command execution, and registry management (add/remove curated and custom VPNs). Mock the privileged helper XPC calls.
-
-4. **PrivilegedHelper** — Separate test target. Test command whitelisting (only approved VPN commands execute), proper XPC communication protocol, and error handling for missing CLIs.
+3. **VPNManager** — Test VPN discovery, status mapping from `NEVPNStatus`, connect/disconnect dispatch, enabled/disabled filtering, multi-VPN warning logic, and configuration reload handling. Mock the Network Extension framework via a `VPNConfigurationProviding` protocol.
 
 5. **IPService** — Test local IP resolution, external IP fetch with mock DNS responses (Cloudflare primary, OpenDNS fallback), caching behavior (30-second TTL), refresh mode switching, auto-refresh on VPN state change, and failure/retry handling.
 
@@ -189,7 +184,8 @@ Tests should verify external behavior through each module's public interface, no
 
 The following are explicitly deferred to future versions (see ROADMAP.md):
 
-- Custom VPN support (user-defined CLI commands) — deferred to V1.x; V1 ships with curated VPNs only (WireGuard, Tailscale, PIA)
+- Custom VPN configurations (user-defined VPN profiles) — deferred to a future version; V1 auto-discovers all existing system VPN profiles
+- VPN leak detection (DNS leaks, IPv6 leaks, packet-level inspection) — far-future roadmap item
 
 - Speed test (upload/download bandwidth measurement)
 - Network connection history / logging
@@ -210,6 +206,6 @@ The following are explicitly deferred to future versions (see ROADMAP.md):
 
 - **Privacy is a core value.** No data is logged to disk. No telemetry unless the user opts in. External IP is resolved via DNS lookup (Cloudflare/OpenDNS) — no third-party HTTPS API involved. This must be maintained in all future development.
 - **The free tier must be genuinely useful**, not crippled. It should be a good Wi-Fi utility on its own that people recommend, driving organic adoption and paid conversions.
-- **VPN curated list is a living document.** New VPN providers should be added over time based on user requests and popularity. Community contributions are welcome under the BSL license.
+- **VPN support is universal.** Any VPN that registers a system profile (visible in System Settings > VPN) is automatically discovered and controllable. No curated list to maintain.
 - **First-time app seller.** Build and release processes should be well-documented and straightforward. LemonSqueezy was chosen for simplicity of onboarding.
 - **Golden Gate compatibility.** The app must be tested on macOS 27 (Golden Gate) beta since that is the developer's primary machine. Monitor Apple beta release notes for API changes affecting CoreWLAN, NWPathMonitor, and SMAppService.

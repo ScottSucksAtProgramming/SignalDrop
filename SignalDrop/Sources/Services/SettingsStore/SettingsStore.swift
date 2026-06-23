@@ -69,8 +69,14 @@ final class SettingsStore: ObservableObject {
         didSet { defaults.set(Int(pingPort), forKey: Keys.pingPort) }
     }
 
-    @Published var enabledVPNs: Set<String> = Set(VPNDefinition.allCurated.map(\.id)) {
-        didSet { defaults.set(Array(enabledVPNs), forKey: Keys.enabledVPNs) }
+    /// VPNs the user has hidden from the popover, keyed by SCNetworkService UUID.
+    /// Opt-out: newly discovered VPNs are shown by default.
+    @Published var hiddenVPNs: Set<String> = [] {
+        didSet { defaults.set(Array(hiddenVPNs), forKey: Keys.hiddenVPNs) }
+    }
+
+    @Published var vpnTapAction: VPNTapAction = .openApp {
+        didSet { defaults.set(vpnTapAction.rawValue, forKey: Keys.vpnTapAction) }
     }
 
     @Published var showMultiVPNWarning: Bool = true {
@@ -123,8 +129,11 @@ final class SettingsStore: ObservableObject {
         if defaults.object(forKey: Keys.pingPort) != nil {
             pingPort = UInt16(defaults.integer(forKey: Keys.pingPort))
         }
-        if let vpnArray = defaults.array(forKey: Keys.enabledVPNs) as? [String] {
-            enabledVPNs = Set(vpnArray)
+        if let vpnArray = defaults.array(forKey: Keys.hiddenVPNs) as? [String] {
+            hiddenVPNs = Set(vpnArray)
+        }
+        if defaults.object(forKey: Keys.vpnTapAction) != nil {
+            vpnTapAction = VPNTapAction(rawValue: defaults.integer(forKey: Keys.vpnTapAction)) ?? .openApp
         }
         if defaults.object(forKey: Keys.showMultiVPNWarning) != nil {
             showMultiVPNWarning = defaults.bool(forKey: Keys.showMultiVPNWarning)
@@ -147,7 +156,13 @@ final class SettingsStore: ObservableObject {
         static let showPing = "showPing"
         static let pingTarget = "pingTarget"
         static let pingPort = "pingPort"
-        static let enabledVPNs = "enabledVPNs"
+        static let hiddenVPNs = "hiddenVPNs"
+        static let vpnTapAction = "vpnTapAction"
         static let showMultiVPNWarning = "showMultiVPNWarning"
     }
+}
+
+enum VPNTapAction: Int {
+    case openApp
+    case openSystemSettings
 }
