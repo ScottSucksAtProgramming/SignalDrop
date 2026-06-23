@@ -128,3 +128,51 @@ Phase 4 — VPN:
 		- scutil --nc list (SystemConfiguration) sees all system VPN profiles read-only — gives UUID, display name, status, and provider bundle ID.
 		- System Settings deep-link for VPN & Filters: x-apple.systempreferences:com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension
 		- When filtering items by user preferences (e.g. hidden VPNs), distinguish "none exist" from "all hidden" in empty states.
+
+Phase 5a — Notifications + Hotkeys:
+	Branch: phase/5a-notifications-hotkeys
+	- @done Implement NotificationService — observes NetworkMonitor, VPNManager, IPService state changes @done(2026-06-23)
+	- @done Implement notification dispatch via UNUserNotificationCenter @done(2026-06-23)
+	- @done Implement notification types: VPN drop, IP change, Wi-Fi disconnect, network change @done(2026-06-23)
+	- @done Implement per-type notification toggles @done(2026-06-23)
+	- @done Gate notifications behind LicenseManager.isPaid @done(2026-06-23)
+	- @done Implement HotkeyManager — global keyboard shortcut registration and dispatch @done(2026-06-23)
+	- @done Implement configurable hotkeys: open/close popover, toggle Wi-Fi, copy local/external IP, refresh external IP @done(2026-06-23)
+	- @done Implement conflict detection for hotkey assignments @done(2026-06-23)
+	- @done Gate hotkeys behind LicenseManager.isPaid @done(2026-06-23)
+	- @done Add Settings tab: notification toggles per event type @done(2026-06-23)
+	- @done Add Settings tab: hotkey configuration with conflict warnings @done(2026-06-23)
+	- @done Write unit tests for NotificationService (correct notifications fire, per-type toggles suppress, mock UNUserNotificationCenter) @done(2026-06-23)
+	- @done Write unit tests for HotkeyManager (registration, unregistration, conflict detection, action dispatch) @done(2026-06-23)
+	- @done Add VoiceOver accessibility labels to all Phase 5a UI elements @done(2026-06-23)
+	- @done All user-facing strings use String(localized:) @done(2026-06-23)
+	- @done Manual test against PRD user stories 36-39 (Notifications) @done(2026-06-23)
+	- @done Manual test against PRD user stories 40-44 (Keyboard shortcuts) @done(2026-06-23)
+	- @done Regression test: all Phase 1-4 user stories @done(2026-06-23)
+	Discoveries:
+		- Carbon RegisterEventHotKey avoids Accessibility permission requirement (vs CGEvent tap)
+		- Default hotkey bindings seeded on first run via HotkeyAction.defaultBindings
+		- nonisolated(unsafe) static var shared needed on HotkeyManager for Carbon callback (Swift 6 strict concurrency)
+		- button.imagePosition = .imageLeading required for NSStatusBarButton to show title alongside image
+		- Network-change notification needs SSID tracking + 2s debounce on disconnect to avoid false fire during network switch
+		- Subnet mask via getifaddrs, gateway via netstat -rn, DNS via scutil --dns — all populated in NetworkMonitor.refreshWiFiInfo()
+
+Phase 5b — UI Polish:
+	Branch: phase/5a-notifications-hotkeys (combined with 5a)
+	- @done Implement collapsible popover sections (gate behind LicenseManager.isPaid) @done(2026-06-23)
+	- @done Implement configurable menu bar display (choose: Wi-Fi icon, network name, VPN indicators, IP address) @done(2026-06-23)
+	- @done Gate configurable menu bar behind LicenseManager.isPaid @done(2026-06-23)
+	- @done Implement copy/export all network info to clipboard (one-click, formatted for tech support) @done(2026-06-23)
+	- @done Implement popover max height with scrolling and dynamic resize @done(2026-06-23)
+	- @done Implement popover close on click outside @done(2026-06-23)
+	- @done Polish Wi-Fi off state UI (minimal popover with re-enable toggle, VPN section still visible) @done(2026-06-23)
+	- @done Add VoiceOver accessibility labels to all Phase 5b UI elements @done(2026-06-23)
+	- @done All user-facing strings use String(localized:) @done(2026-06-23)
+	- @done Manual test against PRD user stories 3, 6-7 (configurable menu bar) @done(2026-06-23)
+	- @done Manual test against PRD user stories 50-52 (settings, collapsible sections, dark/light mode) @done(2026-06-23)
+	- @done Manual test against PRD user story 64 (copy/export network info) @done(2026-06-23)
+	- @done Regression test: all Phase 1-5a user stories @done(2026-06-23)
+	Discoveries:
+		- All 5a + 5b work done on single branch (phase/5a-notifications-hotkeys) for simplicity
+		- Per-VPN hotkeys deferred — VPN is read-only so hotkey can only deep-link, questionable value
+		- Menu bar overflow on notched MacBooks handled by macOS menu bar hider, not custom truncation
