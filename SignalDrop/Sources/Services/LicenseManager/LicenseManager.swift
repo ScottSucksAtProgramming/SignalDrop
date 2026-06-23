@@ -1,8 +1,8 @@
 import Foundation
 import Combine
 
-final class LicenseManager: ObservableObject {
-    @Published private(set) var isPaid: Bool = false
+class LicenseManager: ObservableObject {
+    @Published internal(set) var isPaid: Bool = false
     @Published private(set) var licenseKey: String?
 
     func validateLicense() async {

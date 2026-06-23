@@ -7,10 +7,12 @@ final class NetworkMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var state = NetworkState()
 
     private let pathMonitor: NetworkPathProviding
+    private let ipService: IPService
     private let monitorQueue = DispatchQueue(label: "com.scottkostolni.SignalDrop.networkMonitor")
 
-    init(pathMonitor: NetworkPathProviding = NWPathMonitor()) {
+    init(pathMonitor: NetworkPathProviding = NWPathMonitor(), ipService: IPService = IPService()) {
         self.pathMonitor = pathMonitor
+        self.ipService = ipService
     }
 
     func start() {
@@ -55,7 +57,7 @@ final class NetworkMonitor: ObservableObject, @unchecked Sendable {
             }
         }()
 
-        let localIP = Self.getIPAddress()
+        let localIP = IPService.getIPAddress()
 
         DispatchQueue.main.async { [weak self] in
             self?.state.ssid = ssid
@@ -91,7 +93,7 @@ final class NetworkMonitor: ObservableObject, @unchecked Sendable {
             return nil
         }()
 
-        let ethernetIP: String? = hasEthernet ? Self.getIPAddress(forInterface: "en0") ?? Self.getIPAddress(forInterface: "en1") : nil
+        let ethernetIP: String? = hasEthernet ? IPService.getIPAddress(forInterface: "en0") ?? IPService.getIPAddress(forInterface: "en1") : nil
 
         DispatchQueue.main.async { [weak self] in
             self?.state.isConnected = isConnected
@@ -106,35 +108,4 @@ final class NetworkMonitor: ObservableObject, @unchecked Sendable {
         }
     }
 
-    static func getIPAddress(forInterface targetName: String? = nil) -> String? {
-        var address: String?
-        var ifaddr: UnsafeMutablePointer<ifaddrs>?
-
-        guard getifaddrs(&ifaddr) == 0, let firstAddr = ifaddr else { return nil }
-        defer { freeifaddrs(ifaddr) }
-
-        for ptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
-            let iface = ptr.pointee
-            let addrFamily = iface.ifa_addr.pointee.sa_family
-            guard addrFamily == UInt8(AF_INET) else { continue }
-
-            let name = String(cString: iface.ifa_name)
-            if let target = targetName {
-                guard name == target else { continue }
-            } else {
-                guard name == "en0" || name == "en1" else { continue }
-            }
-
-            var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-            if getnameinfo(
-                iface.ifa_addr, socklen_t(iface.ifa_addr.pointee.sa_len),
-                &hostname, socklen_t(hostname.count),
-                nil, 0, NI_NUMERICHOST
-            ) == 0 {
-                address = String(cString: hostname)
-                break
-            }
-        }
-        return address
-    }
 }

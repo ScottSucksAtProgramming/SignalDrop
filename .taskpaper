@@ -83,27 +83,33 @@ Phase 2 — Wi-Fi Management:
 
 Phase 3 — IP + Ping:
 	Branch: phase/3-ip-ping
-	- Implement IPService — local IP from network interfaces (free tier)
-	- Implement IPService — external IP via DNS query (Cloudflare whoami.cloudflare primary, OpenDNS fallback)
-	- Gate external IP behind LicenseManager.isPaid
-	- Implement configurable refresh modes (timed interval, on-demand manual refresh)
-	- Implement 30-second cache for external IP
-	- Implement "Unavailable" state with retry button on fetch failure
-	- Implement click-to-copy IP to clipboard
-	- Implement PingService — TCP-based latency via NWConnection to configurable target (default 1.1.1.1:443)
-	- Gate PingService behind LicenseManager.isPaid
-	- Implement ping/latency display in popover (ms readout, toggle on/off)
-	- Add Settings tab: IP refresh mode and interval, ping target configuration
+	- @done Implement IPService — local IP from network interfaces (free tier) @done(2026-06-22)
+	- @done Implement IPService — external IP via DNS query (Cloudflare whoami.cloudflare primary, OpenDNS fallback) @done(2026-06-22)
+	- @done Gate external IP behind LicenseManager.isPaid @done(2026-06-22)
+	- @done Implement configurable refresh modes (timed interval, on-demand manual refresh) @done(2026-06-22)
+	- @done Implement 30-second cache for external IP @done(2026-06-22)
+	- @done Implement "Unavailable" state with retry button on fetch failure @done(2026-06-22)
+	- @done Implement click-to-copy IP to clipboard @done(2026-06-22)
+	- @done Implement PingService — TCP-based latency via NWConnection to configurable target (default 1.1.1.1:443) @done(2026-06-22)
+	- @done Gate PingService behind LicenseManager.isPaid @done(2026-06-22)
+	- @done Implement ping/latency display in popover (ms readout, toggle on/off) @done(2026-06-22)
+	- @done Add Settings tab: IP refresh mode and interval, ping target configuration @done(2026-06-22)
 	- Note: VPN state change auto-refresh wiring deferred to Phase 4
-	- Write unit tests for IPService (mock DNS responses, caching behavior, refresh modes, failure handling)
-	- Write unit tests for PingService (mock NWConnection, latency reporting, start/stop lifecycle)
-	- Add VoiceOver accessibility labels to all Phase 3 UI elements
-	- All user-facing strings use String(localized:)
-	- Update .taskpaper with any discoveries or adjustments
+	- @done Write unit tests for IPService (mock DNS responses, caching behavior, refresh modes, failure handling) @done(2026-06-22)
+	- @done Write unit tests for PingService (mock NWConnection, latency reporting, start/stop lifecycle) @done(2026-06-22)
+	- @done Add VoiceOver accessibility labels to all Phase 3 UI elements @done(2026-06-22)
+	- @done All user-facing strings use String(localized:) @done(2026-06-22)
+	- @done Update .taskpaper with any discoveries or adjustments @done(2026-06-22)
 	- Manual test against PRD user stories 29-32 (IP features)
 	- Manual test against PRD user stories 33-35 (Ping features)
 	- Manual test against PRD user story 31 (copy IP to clipboard)
 	- Regression test: all Phase 1-2 user stories
+	Discoveries:
+		- Raw DNS over UDP via NWConnection works well for external IP — no need for libresolv or shelling out
+		- Swift 6 strict concurrency: NWConnection callbacks need thread-safe continuation handling (ContinuationGate pattern with NSLock)
+		- LicenseManager changed from final to open class with internal(set) isPaid for test subclassing
+		- Local IP resolution moved from NetworkMonitor to IPService to establish proper module ownership per PRD
+		- DetailRow copyable pattern: adding copyable:true flag to existing view component avoids copy-paste code across IP displays
 
 Phase 4 — VPN:
 	Branch: phase/4-vpn

@@ -36,6 +36,11 @@ wifi-menubar/
         WiFiManager/
           WiFiManager.swift
           CoreWLANScanner.swift
+        IPService/
+          IPService.swift
+          DNSExternalIPResolver.swift
+        PingService/
+          PingService.swift
         SettingsStore/
           SettingsStore.swift
         LicenseManager/
@@ -48,9 +53,11 @@ wifi-menubar/
           EthernetInfoView.swift
           NetworkListView.swift
           PasswordInputView.swift
+          IPPingView.swift
         Settings/
           SettingsView.swift
           NetworkDetailsSettingsView.swift
+          IPPingSettingsView.swift
         Onboarding/
     Resources/
       Info.plist
@@ -59,6 +66,8 @@ wifi-menubar/
     NetworkMonitorTests.swift
     SettingsStoreTests.swift
     WiFiManagerTests.swift
+    IPServiceTests.swift
+    PingServiceTests.swift
     Mocks/
       MockWiFiScanner.swift
   handoffs/          (local only, .gitignored — session handoff docs)

@@ -4,6 +4,9 @@ struct PopoverView: View {
     @ObservedObject var networkMonitor: NetworkMonitor
     @ObservedObject var wifiManager: WiFiManager
     @ObservedObject var settingsStore: SettingsStore
+    @ObservedObject var ipService: IPService
+    @ObservedObject var pingService: PingService
+    @ObservedObject var licenseManager: LicenseManager
     var onOpenSettings: () -> Void = {}
 
     var body: some View {
@@ -17,6 +20,14 @@ struct PopoverView: View {
                 Divider()
                 EthernetInfoView(networkMonitor: networkMonitor)
             }
+
+            Divider()
+            IPPingView(
+                ipService: ipService,
+                pingService: pingService,
+                licenseManager: licenseManager,
+                settingsStore: settingsStore
+            )
 
             if networkMonitor.state.isWiFiPoweredOn {
                 Divider()
@@ -68,6 +79,9 @@ struct PopoverView: View {
 struct DetailRow: View {
     let label: String
     let value: String
+    var copyable: Bool = false
+
+    @State private var showCopied = false
 
     var body: some View {
         HStack {
@@ -75,11 +89,37 @@ struct DetailRow: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer()
-            Text(value)
-                .font(.caption)
-                .fontDesign(.monospaced)
+
+            if copyable {
+                Button {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(value, forType: .string)
+                    showCopied = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        showCopied = false
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(showCopied ? String(localized: "Copied!") : value)
+                            .font(.caption)
+                            .fontDesign(.monospaced)
+                        if !showCopied {
+                            Image(systemName: "doc.on.doc")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "\(label): \(value). Click to copy."))
+                .accessibilityHint(String(localized: "Copies \(value) to clipboard"))
+            } else {
+                Text(value)
+                    .font(.caption)
+                    .fontDesign(.monospaced)
+            }
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(label): \(value)")
+        .accessibilityElement(children: copyable ? .contain : .combine)
+        .accessibilityLabel(copyable ? "" : "\(label): \(value)")
     }
 }

@@ -30,7 +30,8 @@ struct EthernetInfoView: View {
             if let ip = networkMonitor.state.ethernetIPAddress {
                 DetailRow(
                     label: String(localized: "IP Address"),
-                    value: ip
+                    value: ip,
+                    copyable: true
                 )
             }
 

@@ -11,6 +11,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let networkMonitor = NetworkMonitor()
     private lazy var wifiManager = WiFiManager()
     private let locationManager = LocationPermissionManager()
+    private lazy var ipService = IPService(licenseManager: licenseManager)
+    private lazy var pingService = PingService(licenseManager: licenseManager)
     private var cancellables = Set<AnyCancellable>()
     private var settingsWindow: NSWindow?
 
@@ -21,6 +23,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         observeNetworkState()
         networkMonitor.start()
         wifiManager.scan()
+        ipService.refreshLocalIP()
+        ipService.observeSettings(settingsStore)
+        observePingSettings()
     }
 
     private func setupStatusItem() {
@@ -42,6 +47,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 networkMonitor: networkMonitor,
                 wifiManager: wifiManager,
                 settingsStore: settingsStore,
+                ipService: ipService,
+                pingService: pingService,
+                licenseManager: licenseManager,
                 onOpenSettings: { [weak self] in
                     self?.openSettings()
                 }
@@ -106,6 +114,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsWindow = window
     }
 
+    private func observePingSettings() {
+        settingsStore.$showPing
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] showPing in
+                guard let self else { return }
+                if showPing && licenseManager.isPaid {
+                    pingService.target = settingsStore.pingTarget
+                    pingService.port = settingsStore.pingPort
+                    pingService.start()
+                } else {
+                    pingService.stop()
+                }
+            }
+            .store(in: &cancellables)
+
+        settingsStore.$pingTarget
+            .combineLatest(settingsStore.$pingPort)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] target, port in
+                guard let self, pingService.isRunning else { return }
+                pingService.target = target
+                pingService.port = port
+                pingService.measureOnce()
+            }
+            .store(in: &cancellables)
+    }
+
     @objc private func togglePopover() {
         guard let button = statusItem.button else { return }
 
@@ -113,6 +148,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(nil)
         } else {
             wifiManager.scan()
+            ipService.refreshLocalIP()
+            ipService.refreshExternalIP()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
         }

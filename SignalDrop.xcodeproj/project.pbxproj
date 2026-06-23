@@ -9,28 +9,35 @@
 /* Begin PBXBuildFile section */
 		137FAE03AB4956BF90BC00C3 /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB430701DF37FB571158952 /* LocationPermissionManager.swift */; };
 		1CB3627936BA465A4113D114 /* WiFiManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075B27AD0C4CA7A605DEC0C /* WiFiManagerTests.swift */; };
+		227F88B1ABA0C8B39CA8F966 /* EthernetInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2CD92739600BB08811AC638 /* EthernetInfoView.swift */; };
+		27A0453F3CFD26C8DA0774E6 /* NetworkDetailsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F963198BE0886574DE339EE /* NetworkDetailsSettingsView.swift */; };
+		2C1CDB55D19C1B0A5B03D511 /* PasswordInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A32EE349CD842FAB76409E /* PasswordInputView.swift */; };
+		33157F7E2A6B282152E660C6 /* IPPingSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C2E65E89C29A08AE0B400F /* IPPingSettingsView.swift */; };
 		36DCB16E7D025FC041734194 /* LicenseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C067A1C029FBC1459E4D160A /* LicenseManager.swift */; };
+		38913A6C7A37F69E2B0DB11C /* ConnectionInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3891D7E312D1D80B1AF9C4FF /* ConnectionInfoView.swift */; };
 		3C90EBBBDF241510A23EAE7A /* CoreWLANScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62A5C3D8B9507CD61754770F /* CoreWLANScanner.swift */; };
 		3E15A7570E10E4144299BA03 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B91E39A1005C4C56DBD0F7B /* NetworkMonitor.swift */; };
 		47DB8C01BC75BD4BA2E85B4A /* SettingsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA44347302FD6DAABA32D449 /* SettingsStoreTests.swift */; };
+		496018E0AA53D17DC23C82DB /* PingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132B2396A4777E10135FD5A4 /* PingService.swift */; };
+		576AD9C0B66E3780520865CB /* DNSExternalIPResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28431C955EEC49E29514ADDE /* DNSExternalIPResolver.swift */; };
+		5E3B2E121972AD01F806FFF8 /* NetworkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C814CA8EB0A35B6F8358284 /* NetworkListView.swift */; };
 		61845C02EBD831D7EFBBDD7F /* NetworkPathProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23903D2A2D5EE8014659E68B /* NetworkPathProviding.swift */; };
 		670FF31DFC473E183CF949E5 /* WLANInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277E39C5D69B4D195D2CDE8C /* WLANInterface.swift */; };
 		6979FA167CE57FE3F0FF16AC /* ScannedNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138980E9CC1A54ED8A444150 /* ScannedNetwork.swift */; };
 		6F6E70B9C2C778A8AE46F21D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C09F3A5E1018C8316A63E9 /* AppDelegate.swift */; };
 		7DF30EE91DA1FDFD66B11E76 /* MockWiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC2EFA2BBD8B6EB3E19A7F3 /* MockWiFiScanner.swift */; };
 		841EA50D51D605532CE489CC /* WiFiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7874C8D672D58426624AE6 /* WiFiManager.swift */; };
+		853C9C6103AE2C3880E59975 /* PingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063DB362C7709F5328ABC8E0 /* PingServiceTests.swift */; };
 		93D254E0E4D0B70CC99E1765 /* NetworkMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28951E9F4BA37BA2712A179 /* NetworkMonitorTests.swift */; };
 		97BF89AF493A3F4A0AD86B0A /* SMAppServiceSpike.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82529D2CF31477B9C31B35C7 /* SMAppServiceSpike.swift */; };
 		9CAA0FA3DE1249CB0F5C87F7 /* NetworkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2450E05B07FCE949C9125428 /* NetworkState.swift */; };
 		A166767B4CEB9BB6C6B7BA62 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0A8566906378BA738AC945 /* SettingsStore.swift */; };
 		A699F5142ED7AF9132EFDE81 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2531AC618135BFB914CE8F /* SettingsView.swift */; };
-		B1C2D3E4F5A6B7C8D9E0F1A2 /* NetworkDetailsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D3E4F5A6B7C8D9E0F1A2B3 /* NetworkDetailsSettingsView.swift */; };
-		C42A1B3D7E8F5A9C0D6E4B12 /* ConnectionInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73B2C4E8F9D6A0B1E5F3C23 /* ConnectionInfoView.swift */; };
+		AAB6E4A9644ECA4A17C5CCDC /* IPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 486DF2FBC755E5A3643D9950 /* IPService.swift */; };
+		BBEA99FD5575D56C1754FA96 /* IPPingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71A58932ED843AE45D31093 /* IPPingView.swift */; };
 		C53E0CF4030D83094901E688 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFA464FE203480A56518CEA /* PopoverView.swift */; };
-		D4E5F6A7B8C9D0E1F2A3B4C5 /* EthernetInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0E1F2A3B4C5D6 /* EthernetInfoView.swift */; };
-		F6A7B8C9D0E1F2A3B4C5D6E7 /* NetworkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B8C9D0E1F2A3B4C5D6E7F8 /* NetworkListView.swift */; };
-		B8C9D0E1F2A3B4C5D6E7F8A9 /* PasswordInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D0E1F2A3B4C5D6E7F8A9B0 /* PasswordInputView.swift */; };
 		D673BCB5B9D0D78FC14A42F2 /* SignalDropApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39B10D221CDFE333470910A /* SignalDropApp.swift */; };
+		D88312101C3C5E05363B97A2 /* IPServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127FBB19FA4B2CD3A635AB24 /* IPServiceTests.swift */; };
 		DD20419DE2C057AD201EE73B /* WiFiScanning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBE1756C0180A78569C570 /* WiFiScanning.swift */; };
 		EB1657C25EF10FE460F98CA2 /* ShellExecuting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72016D3562503BBE1B4F2DBF /* ShellExecuting.swift */; };
 /* End PBXBuildFile section */
@@ -47,29 +54,36 @@
 
 /* Begin PBXFileReference section */
 		0397BB45E4121A74672B89DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		063DB362C7709F5328ABC8E0 /* PingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingServiceTests.swift; sourceTree = "<group>"; };
+		0F963198BE0886574DE339EE /* NetworkDetailsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetailsSettingsView.swift; sourceTree = "<group>"; };
+		127FBB19FA4B2CD3A635AB24 /* IPServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPServiceTests.swift; sourceTree = "<group>"; };
+		132B2396A4777E10135FD5A4 /* PingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingService.swift; sourceTree = "<group>"; };
 		138980E9CC1A54ED8A444150 /* ScannedNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannedNetwork.swift; sourceTree = "<group>"; };
 		1A0A8566906378BA738AC945 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		23903D2A2D5EE8014659E68B /* NetworkPathProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPathProviding.swift; sourceTree = "<group>"; };
 		2450E05B07FCE949C9125428 /* NetworkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkState.swift; sourceTree = "<group>"; };
 		277E39C5D69B4D195D2CDE8C /* WLANInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WLANInterface.swift; sourceTree = "<group>"; };
+		28431C955EEC49E29514ADDE /* DNSExternalIPResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSExternalIPResolver.swift; sourceTree = "<group>"; };
+		3891D7E312D1D80B1AF9C4FF /* ConnectionInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionInfoView.swift; sourceTree = "<group>"; };
+		39C2E65E89C29A08AE0B400F /* IPPingSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPingSettingsView.swift; sourceTree = "<group>"; };
 		4075B27AD0C4CA7A605DEC0C /* WiFiManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiManagerTests.swift; sourceTree = "<group>"; };
+		486DF2FBC755E5A3643D9950 /* IPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPService.swift; sourceTree = "<group>"; };
 		49AD2F02DFC5832A81882A9B /* SignalDropTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SignalDropTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DFBE1756C0180A78569C570 /* WiFiScanning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiScanning.swift; sourceTree = "<group>"; };
 		58C09F3A5E1018C8316A63E9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5D7874C8D672D58426624AE6 /* WiFiManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiManager.swift; sourceTree = "<group>"; };
 		62A5C3D8B9507CD61754770F /* CoreWLANScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreWLANScanner.swift; sourceTree = "<group>"; };
+		63A32EE349CD842FAB76409E /* PasswordInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordInputView.swift; sourceTree = "<group>"; };
 		6B91E39A1005C4C56DBD0F7B /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		72016D3562503BBE1B4F2DBF /* ShellExecuting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellExecuting.swift; sourceTree = "<group>"; };
+		7C814CA8EB0A35B6F8358284 /* NetworkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkListView.swift; sourceTree = "<group>"; };
 		82529D2CF31477B9C31B35C7 /* SMAppServiceSpike.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMAppServiceSpike.swift; sourceTree = "<group>"; };
 		8FB430701DF37FB571158952 /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
+		A2CD92739600BB08811AC638 /* EthernetInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthernetInfoView.swift; sourceTree = "<group>"; };
+		A71A58932ED843AE45D31093 /* IPPingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPingView.swift; sourceTree = "<group>"; };
 		AAC2EFA2BBD8B6EB3E19A7F3 /* MockWiFiScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWiFiScanner.swift; sourceTree = "<group>"; };
 		AB2531AC618135BFB914CE8F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		C2D3E4F5A6B7C8D9E0F1A2B3 /* NetworkDetailsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetailsSettingsView.swift; sourceTree = "<group>"; };
-		A73B2C4E8F9D6A0B1E5F3C23 /* ConnectionInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionInfoView.swift; sourceTree = "<group>"; };
 		BEFA464FE203480A56518CEA /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
-		E5F6A7B8C9D0E1F2A3B4C5D6 /* EthernetInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthernetInfoView.swift; sourceTree = "<group>"; };
-		A7B8C9D0E1F2A3B4C5D6E7F8 /* NetworkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkListView.swift; sourceTree = "<group>"; };
-		C9D0E1F2A3B4C5D6E7F8A9B0 /* PasswordInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordInputView.swift; sourceTree = "<group>"; };
 		C067A1C029FBC1459E4D160A /* LicenseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseManager.swift; sourceTree = "<group>"; };
 		D28951E9F4BA37BA2712A179 /* NetworkMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitorTests.swift; sourceTree = "<group>"; };
 		D39B10D221CDFE333470910A /* SignalDropApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalDropApp.swift; sourceTree = "<group>"; };
@@ -105,8 +119,9 @@
 		27BBE3CC89284065A71A32C5 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				39C2E65E89C29A08AE0B400F /* IPPingSettingsView.swift */,
+				0F963198BE0886574DE339EE /* NetworkDetailsSettingsView.swift */,
 				AB2531AC618135BFB914CE8F /* SettingsView.swift */,
-				C2D3E4F5A6B7C8D9E0F1A2B3 /* NetworkDetailsSettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -128,10 +143,11 @@
 		4F7FF070CEC077166B4B657B /* Popover */ = {
 			isa = PBXGroup;
 			children = (
-				A73B2C4E8F9D6A0B1E5F3C23 /* ConnectionInfoView.swift */,
-				E5F6A7B8C9D0E1F2A3B4C5D6 /* EthernetInfoView.swift */,
-				A7B8C9D0E1F2A3B4C5D6E7F8 /* NetworkListView.swift */,
-				C9D0E1F2A3B4C5D6E7F8A9B0 /* PasswordInputView.swift */,
+				3891D7E312D1D80B1AF9C4FF /* ConnectionInfoView.swift */,
+				A2CD92739600BB08811AC638 /* EthernetInfoView.swift */,
+				A71A58932ED843AE45D31093 /* IPPingView.swift */,
+				7C814CA8EB0A35B6F8358284 /* NetworkListView.swift */,
+				63A32EE349CD842FAB76409E /* PasswordInputView.swift */,
 				BEFA464FE203480A56518CEA /* PopoverView.swift */,
 			);
 			path = Popover;
@@ -208,6 +224,7 @@
 		916DF6E61452DD16AC07D30E /* PingService */ = {
 			isa = PBXGroup;
 			children = (
+				132B2396A4777E10135FD5A4 /* PingService.swift */,
 			);
 			path = PingService;
 			sourceTree = "<group>";
@@ -215,7 +232,9 @@
 		9437FA9566C6135EDFB9B1A5 /* SignalDropTests */ = {
 			isa = PBXGroup;
 			children = (
+				127FBB19FA4B2CD3A635AB24 /* IPServiceTests.swift */,
 				D28951E9F4BA37BA2712A179 /* NetworkMonitorTests.swift */,
+				063DB362C7709F5328ABC8E0 /* PingServiceTests.swift */,
 				DA44347302FD6DAABA32D449 /* SettingsStoreTests.swift */,
 				4075B27AD0C4CA7A605DEC0C /* WiFiManagerTests.swift */,
 				C3FD048E610088F4B5CABFA4 /* Mocks */,
@@ -287,6 +306,8 @@
 		F18E2A517F8FE689C87C47FB /* IPService */ = {
 			isa = PBXGroup;
 			children = (
+				28431C955EEC49E29514ADDE /* DNSExternalIPResolver.swift */,
+				486DF2FBC755E5A3643D9950 /* IPService.swift */,
 			);
 			path = IPService;
 			sourceTree = "<group>";
@@ -391,8 +412,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D88312101C3C5E05363B97A2 /* IPServiceTests.swift in Sources */,
 				7DF30EE91DA1FDFD66B11E76 /* MockWiFiScanner.swift in Sources */,
 				93D254E0E4D0B70CC99E1765 /* NetworkMonitorTests.swift in Sources */,
+				853C9C6103AE2C3880E59975 /* PingServiceTests.swift in Sources */,
 				47DB8C01BC75BD4BA2E85B4A /* SettingsStoreTests.swift in Sources */,
 				1CB3627936BA465A4113D114 /* WiFiManagerTests.swift in Sources */,
 			);
@@ -403,22 +426,27 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F6E70B9C2C778A8AE46F21D /* AppDelegate.swift in Sources */,
+				38913A6C7A37F69E2B0DB11C /* ConnectionInfoView.swift in Sources */,
 				3C90EBBBDF241510A23EAE7A /* CoreWLANScanner.swift in Sources */,
+				576AD9C0B66E3780520865CB /* DNSExternalIPResolver.swift in Sources */,
+				227F88B1ABA0C8B39CA8F966 /* EthernetInfoView.swift in Sources */,
+				33157F7E2A6B282152E660C6 /* IPPingSettingsView.swift in Sources */,
+				BBEA99FD5575D56C1754FA96 /* IPPingView.swift in Sources */,
+				AAB6E4A9644ECA4A17C5CCDC /* IPService.swift in Sources */,
 				36DCB16E7D025FC041734194 /* LicenseManager.swift in Sources */,
 				137FAE03AB4956BF90BC00C3 /* LocationPermissionManager.swift in Sources */,
+				27A0453F3CFD26C8DA0774E6 /* NetworkDetailsSettingsView.swift in Sources */,
+				5E3B2E121972AD01F806FFF8 /* NetworkListView.swift in Sources */,
 				3E15A7570E10E4144299BA03 /* NetworkMonitor.swift in Sources */,
 				61845C02EBD831D7EFBBDD7F /* NetworkPathProviding.swift in Sources */,
 				9CAA0FA3DE1249CB0F5C87F7 /* NetworkState.swift in Sources */,
-				C42A1B3D7E8F5A9C0D6E4B12 /* ConnectionInfoView.swift in Sources */,
-				D4E5F6A7B8C9D0E1F2A3B4C5 /* EthernetInfoView.swift in Sources */,
-				F6A7B8C9D0E1F2A3B4C5D6E7 /* NetworkListView.swift in Sources */,
-				B8C9D0E1F2A3B4C5D6E7F8A9 /* PasswordInputView.swift in Sources */,
+				2C1CDB55D19C1B0A5B03D511 /* PasswordInputView.swift in Sources */,
+				496018E0AA53D17DC23C82DB /* PingService.swift in Sources */,
 				C53E0CF4030D83094901E688 /* PopoverView.swift in Sources */,
 				97BF89AF493A3F4A0AD86B0A /* SMAppServiceSpike.swift in Sources */,
 				6979FA167CE57FE3F0FF16AC /* ScannedNetwork.swift in Sources */,
 				A166767B4CEB9BB6C6B7BA62 /* SettingsStore.swift in Sources */,
 				A699F5142ED7AF9132EFDE81 /* SettingsView.swift in Sources */,
-				B1C2D3E4F5A6B7C8D9E0F1A2 /* NetworkDetailsSettingsView.swift in Sources */,
 				EB1657C25EF10FE460F98CA2 /* ShellExecuting.swift in Sources */,
 				D673BCB5B9D0D78FC14A42F2 /* SignalDropApp.swift in Sources */,
 				670FF31DFC473E183CF949E5 /* WLANInterface.swift in Sources */,

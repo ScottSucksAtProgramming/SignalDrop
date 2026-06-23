@@ -46,7 +46,8 @@ struct ConnectionInfoView: View {
             if let ip = networkMonitor.state.localIPAddress {
                 DetailRow(
                     label: String(localized: "Local IP"),
-                    value: ip
+                    value: ip,
+                    copyable: true
                 )
             }
 

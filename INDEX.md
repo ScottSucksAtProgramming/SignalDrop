@@ -20,11 +20,13 @@ Quick-reference for finding content in this directory. For conventions, see `con
 | `SignalDrop/Sources/Protocols/` | Abstraction protocols — NetworkPathProviding, WLANInterface, ShellExecuting, WiFiScanning |
 | `SignalDrop/Sources/Services/NetworkMonitor/` | NWPathMonitor wrapper — connection state, IP address, Ethernet detection |
 | `SignalDrop/Sources/Services/WiFiManager/` | Wi-Fi management — scanning, joining, power toggle (WiFiManager + CoreWLANScanner) |
-| `SignalDrop/Sources/Services/SettingsStore/` | UserDefaults persistence for all settings (launch at login, detail visibility) |
+| `SignalDrop/Sources/Services/IPService/` | IP address resolution — local IP from interfaces, external IP via DNS (Cloudflare/OpenDNS), 30s cache, refresh modes |
+| `SignalDrop/Sources/Services/PingService/` | TCP-based latency measurement via NWConnection, configurable target/port |
+| `SignalDrop/Sources/Services/SettingsStore/` | UserDefaults persistence for all settings (launch at login, detail visibility, IP refresh, ping) |
 | `SignalDrop/Sources/Services/LicenseManager/` | License/paid-tier gating (stub — returns false) |
-| `SignalDrop/Sources/UI/Popover/` | Popover views — PopoverView, ConnectionInfoView, EthernetInfoView, NetworkListView, PasswordInputView |
-| `SignalDrop/Sources/UI/Settings/` | Settings window — SettingsView (tabbed), NetworkDetailsSettingsView |
-| `SignalDropTests/` | Unit tests — NetworkMonitor, WiFiManager, SettingsStore + MockWiFiScanner |
+| `SignalDrop/Sources/UI/Popover/` | Popover views — PopoverView, ConnectionInfoView, EthernetInfoView, NetworkListView, PasswordInputView, IPPingView |
+| `SignalDrop/Sources/UI/Settings/` | Settings window — SettingsView (tabbed), NetworkDetailsSettingsView, IPPingSettingsView |
+| `SignalDropTests/` | Unit tests — NetworkMonitor, WiFiManager, SettingsStore, IPService, PingService + mocks |
 
 ## context/
 

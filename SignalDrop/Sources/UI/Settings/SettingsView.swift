@@ -14,6 +14,10 @@ struct SettingsView: View {
                 .tabItem {
                     Label(String(localized: "Network Details"), systemImage: "network")
                 }
+            IPPingSettingsView(settingsStore: settingsStore, licenseManager: licenseManager)
+                .tabItem {
+                    Label(String(localized: "IP & Latency"), systemImage: "globe")
+                }
         }
         .frame(width: 450, height: 300)
     }

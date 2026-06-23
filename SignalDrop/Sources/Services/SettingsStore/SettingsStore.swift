@@ -49,6 +49,26 @@ final class SettingsStore: ObservableObject {
         didSet { defaults.set(showSubnet, forKey: Keys.showSubnet) }
     }
 
+    @Published var ipRefreshMode: IPRefreshMode = .onDemand {
+        didSet { defaults.set(ipRefreshMode.rawValue, forKey: Keys.ipRefreshMode) }
+    }
+
+    @Published var ipRefreshInterval: TimeInterval = 60 {
+        didSet { defaults.set(ipRefreshInterval, forKey: Keys.ipRefreshInterval) }
+    }
+
+    @Published var showPing: Bool = false {
+        didSet { defaults.set(showPing, forKey: Keys.showPing) }
+    }
+
+    @Published var pingTarget: String = "1.1.1.1" {
+        didSet { defaults.set(pingTarget, forKey: Keys.pingTarget) }
+    }
+
+    @Published var pingPort: UInt16 = 443 {
+        didSet { defaults.set(Int(pingPort), forKey: Keys.pingPort) }
+    }
+
     private func loadSettings() {
         if defaults.object(forKey: Keys.launchAtLogin) != nil {
             launchAtLogin = defaults.bool(forKey: Keys.launchAtLogin)
@@ -80,6 +100,21 @@ final class SettingsStore: ObservableObject {
         if defaults.object(forKey: Keys.showSubnet) != nil {
             showSubnet = defaults.bool(forKey: Keys.showSubnet)
         }
+        if defaults.object(forKey: Keys.ipRefreshMode) != nil {
+            ipRefreshMode = IPRefreshMode(rawValue: defaults.integer(forKey: Keys.ipRefreshMode)) ?? .onDemand
+        }
+        if defaults.object(forKey: Keys.ipRefreshInterval) != nil {
+            ipRefreshInterval = defaults.double(forKey: Keys.ipRefreshInterval)
+        }
+        if defaults.object(forKey: Keys.showPing) != nil {
+            showPing = defaults.bool(forKey: Keys.showPing)
+        }
+        if defaults.object(forKey: Keys.pingTarget) != nil {
+            pingTarget = defaults.string(forKey: Keys.pingTarget) ?? "1.1.1.1"
+        }
+        if defaults.object(forKey: Keys.pingPort) != nil {
+            pingPort = UInt16(defaults.integer(forKey: Keys.pingPort))
+        }
     }
 
     private enum Keys {
@@ -93,5 +128,10 @@ final class SettingsStore: ObservableObject {
         static let showDNS = "showDNS"
         static let showGateway = "showGateway"
         static let showSubnet = "showSubnet"
+        static let ipRefreshMode = "ipRefreshMode"
+        static let ipRefreshInterval = "ipRefreshInterval"
+        static let showPing = "showPing"
+        static let pingTarget = "pingTarget"
+        static let pingPort = "pingPort"
     }
 }
