@@ -94,3 +94,37 @@ Phase 3 — IP + Ping:
 		- LicenseManager changed from final to open class with internal(set) isPaid for test subclassing
 		- Local IP resolution moved from NetworkMonitor to IPService to establish proper module ownership per PRD
 		- DetailRow copyable pattern: adding copyable:true flag to existing view component avoids copy-paste code across IP displays
+
+Phase 4 — VPN:
+	Branch: phase/4-vpn
+	Architecture: Read-only VPN status via SystemConfiguration (scutil --nc list) + deep-link to owning app or System Settings
+	- @done Delete CLI/helper infrastructure: VPNDefinition.swift, ProcessCommandExecutor.swift, VPNCommandExecuting.swift, ShellExecuting.swift, HelperConstants.swift, PrivilegedHelperManager.swift, PrivilegedHelper/ target, MockVPNCommandExecutor.swift @done(2026-06-23)
+	- @done Remove PrivilegedHelper target from project.yml @done(2026-06-23)
+	- @done Implement VPNConfigurationProviding protocol — abstraction over SystemConfiguration for testability @done(2026-06-23)
+	- @done Implement SystemVPNProvider — parses scutil --nc list for read-only VPN discovery @done(2026-06-23)
+	- @done Rewrite VPNManager — refresh-only (no connect/disconnect), guards isPaid @done(2026-06-23)
+	- @done Implement VPNState model with VPNConnectionStatus enum (connected, connecting, disconnecting, disconnected, unknown) @done(2026-06-23)
+	- @done Implement provider icon mapping via providerBundleIdentifier → SF Symbol @done(2026-06-23)
+	- @done Implement deep-link: click VPN row opens owning app (fallback to System Settings) @done(2026-06-23)
+	- @done Implement configurable tap action setting (open app vs open System Settings) @done(2026-06-23)
+	- @done Update VPNSectionView — status dots, provider icons, deep-link rows, multi-VPN warning, empty states @done(2026-06-23)
+	- @done Update VPNSettingsView — show/hide toggles, tap-action picker, remove "Request a VPN" button, empty state @done(2026-06-23)
+	- @done Update SettingsStore — hiddenVPNs (opt-out by UUID), vpnTapAction enum @done(2026-06-23)
+	- @done Wire IPService auto-refresh to VPN state changes @done(2026-06-23)
+	- @done Update AppDelegate — replace CLI-based wiring with refresh() @done(2026-06-23)
+	- @done Write unit tests for VPNManager (13 tests: discovery, status mapping, paid gate, parse, provider icons, multi-VPN warning) @done(2026-06-23)
+	- @done Implement MockVPNConfigurationProvider for tests @done(2026-06-23)
+	- @done Add VoiceOver accessibility labels to all Phase 4 UI elements @done(2026-06-23)
+	- @done All user-facing strings use String(localized:) @done(2026-06-23)
+	- @done Update CLAUDE.md tree with file changes @done(2026-06-23)
+	- @done Update DESIGN_DECISIONS.md Q42 (read-only pivot rationale) @done(2026-06-23)
+	- @done Manual test: popover lists real VPNs (Rivendell, Tailscale) with correct status dots @done(2026-06-23)
+	- @done Manual test: deep-link opens owning app and System Settings VPN & Filters page @done(2026-06-23)
+	- @done Manual test: hide/show VPNs in settings, correct empty states @done(2026-06-23)
+	- @done Regression test: all Phase 1-3 user stories @done(2026-06-23)
+	- @done All 55 tests pass @done(2026-06-23)
+	Discoveries:
+		- NETunnelProviderManager.loadAllFromPreferences() only returns configs the calling app created — macOS sandboxes NE per-app. Third-party apps cannot discover or toggle other apps' VPNs via Network Extension.
+		- scutil --nc list (SystemConfiguration) sees all system VPN profiles read-only — gives UUID, display name, status, and provider bundle ID.
+		- System Settings deep-link for VPN & Filters: x-apple.systempreferences:com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension
+		- When filtering items by user preferences (e.g. hidden VPNs), distinguish "none exist" from "all hidden" in empty states.

@@ -9,7 +9,7 @@ Everything defined in [SPEC.md](SPEC.md). Development tracked in [.taskpaper](.t
 1. **Walking Skeleton** — Xcode project, menu bar icon, popover, NetworkMonitor, SettingsStore, protocol-based DI, first tests
 2. **Wi-Fi Management** — WiFiManager, network list, switching, Wi-Fi toggle, Ethernet detection
 3. **IP + Ping** — IPService (DNS-based lookup), PingService (TCP-based latency), configurable refresh
-4. **VPN** — VPNManager via Network Extension framework (NEVPNManager), auto-discovery of all system VPN profiles, real-time status, provider icons
+4. **VPN** — Read-only VPN status via SystemConfiguration (`scutil --nc list`), auto-discovery of system VPN profiles, provider icons, deep-link to owning app or System Settings
 5. **Notifications + Hotkeys + Polish** — NotificationService, HotkeyManager, collapsible sections, configurable menu bar
 6. **Licensing + Updates** — LemonSqueezy SDK, Sparkle auto-updates, free/paid feature gating
 7. **Onboarding + Accessibility** — First-run wizard, accessibility audit, edge case polish
@@ -20,7 +20,7 @@ Everything defined in [SPEC.md](SPEC.md). Development tracked in [.taskpaper](.t
 - Menu bar icon with configurable display
 - SwiftUI popover with connection info, VPN toggles, network list
 - Wi-Fi network switching (known networks prioritized)
-- VPN monitoring and toggling (auto-discovers all system VPN profiles via Network Extension)
+- VPN status monitoring with deep-link (auto-discovers system VPN profiles via SystemConfiguration)
 - Local and external IP display (DNS-based lookup) with configurable refresh
 - Ethernet detection and display
 - Ping/latency indicator (TCP-based)
@@ -81,7 +81,7 @@ Sold as a separate product with loyalty discount for V1 buyers.
 
 ### Distribution
 - **Setapp integration** - second revenue channel via Setapp subscription platform
-- **App Store version** - reduced feature set (no VPN toggling, no network switching) for App Store presence and discoverability
+- **App Store version** - reduced feature set (no network switching) for App Store presence and discoverability
 
 ### Localization
 - Community-sourced translations
@@ -89,4 +89,4 @@ Sold as a separate product with loyalty discount for V1 buyers.
 
 ### Platform
 - **Shortcuts/Automator integration** - expose actions for macOS Shortcuts app
-- **AppleScript support** - scriptable VPN toggling and network info queries
+- **AppleScript support** - scriptable network info queries and VPN status
