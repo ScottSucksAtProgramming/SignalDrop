@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var wifiManager = WiFiManager()
     private let locationManager = LocationPermissionManager()
     private var cancellables = Set<AnyCancellable>()
+    private var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         locationManager.requestPermissionIfNeeded()
@@ -42,11 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 wifiManager: wifiManager,
                 settingsStore: settingsStore,
                 onOpenSettings: { [weak self] in
-                    self?.popover.performClose(nil)
-                    DispatchQueue.main.async {
-                        NSApp.activate(ignoringOtherApps: true)
-                        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-                    }
+                    self?.openSettings()
                 }
             )
         )
@@ -80,6 +77,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             systemSymbolName: symbolName,
             accessibilityDescription: String(localized: "SignalDrop network status")
         )
+    }
+
+    private func openSettings() {
+        popover.performClose(nil)
+
+        if let existing = settingsWindow, existing.isVisible {
+            existing.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let settingsView = SettingsView(
+            settingsStore: settingsStore,
+            licenseManager: licenseManager
+        )
+        let hostingController = NSHostingController(rootView: settingsView)
+
+        let window = NSWindow(contentViewController: hostingController)
+        window.title = String(localized: "SignalDrop Settings")
+        window.styleMask = [.titled, .closable]
+        window.setContentSize(NSSize(width: 450, height: 300))
+        window.center()
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+
+        settingsWindow = window
     }
 
     @objc private func togglePopover() {
