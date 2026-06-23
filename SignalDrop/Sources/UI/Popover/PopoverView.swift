@@ -6,6 +6,7 @@ struct PopoverView: View {
     @ObservedObject var settingsStore: SettingsStore
     @ObservedObject var ipService: IPService
     @ObservedObject var pingService: PingService
+    @ObservedObject var vpnManager: VPNManager
     @ObservedObject var licenseManager: LicenseManager
     var onOpenSettings: () -> Void = {}
 
@@ -27,6 +28,13 @@ struct PopoverView: View {
                 pingService: pingService,
                 licenseManager: licenseManager,
                 settingsStore: settingsStore
+            )
+
+            Divider()
+            VPNSectionView(
+                vpnManager: vpnManager,
+                settingsStore: settingsStore,
+                licenseManager: licenseManager
             )
 
             if networkMonitor.state.isWiFiPoweredOn {
