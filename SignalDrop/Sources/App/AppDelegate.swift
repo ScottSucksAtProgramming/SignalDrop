@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let locationManager = LocationPermissionManager()
     private lazy var ipService = IPService(licenseManager: licenseManager)
     private lazy var pingService = PingService(licenseManager: licenseManager)
+    lazy var vpnManager = VPNManager(licenseManager: licenseManager)
     private var cancellables = Set<AnyCancellable>()
     private var settingsWindow: NSWindow?
 
@@ -26,6 +27,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ipService.refreshLocalIP()
         ipService.observeSettings(settingsStore)
         observePingSettings()
+        vpnManager.detectInstalledVPNs()
+        vpnManager.startStatusPolling()
+        observeVPNStateChanges()
     }
 
     private func setupStatusItem() {
@@ -49,6 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 settingsStore: settingsStore,
                 ipService: ipService,
                 pingService: pingService,
+                vpnManager: vpnManager,
                 licenseManager: licenseManager,
                 onOpenSettings: { [weak self] in
                     self?.openSettings()
@@ -98,7 +103,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let settingsView = SettingsView(
             settingsStore: settingsStore,
-            licenseManager: licenseManager
+            licenseManager: licenseManager,
+            vpnManager: vpnManager
         )
         let hostingController = NSHostingController(rootView: settingsView)
 
@@ -141,6 +147,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .store(in: &cancellables)
     }
 
+    private func observeVPNStateChanges() {
+        vpnManager.$vpnStates
+            .map { states in states.filter { $0.status == .connected }.count }
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self, licenseManager.isPaid else { return }
+                ipService.clearCache()
+                ipService.refreshExternalIP()
+            }
+            .store(in: &cancellables)
+    }
+
     @objc private func togglePopover() {
         guard let button = statusItem.button else { return }
 
@@ -150,6 +170,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             wifiManager.scan()
             ipService.refreshLocalIP()
             ipService.refreshExternalIP()
+            vpnManager.refreshAllStatuses()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
         }

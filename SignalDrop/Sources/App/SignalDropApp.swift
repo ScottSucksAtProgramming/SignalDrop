@@ -8,7 +8,8 @@ struct SignalDropApp: App {
         Settings {
             SettingsView(
                 settingsStore: appDelegate.settingsStore,
-                licenseManager: appDelegate.licenseManager
+                licenseManager: appDelegate.licenseManager,
+                vpnManager: appDelegate.vpnManager
             )
         }
     }
