@@ -4,13 +4,15 @@ Pre-Development — Environment & Account Setup:
 	- @done Verify Developer ID Application certificate exists in Apple Developer account (Scott) @tags(scott, blocking) @done(2026-06-22)
 	- Create Developer ID Application certificate if missing (Scott) @tags(scott, blocking) — NOT NEEDED, cert exists
 	- Create app-specific password for notarytool via Apple ID → Security (Scott) @tags(scott)
-	- Research and validate app name "WireBar" — check Mac App Store, USPTO (TESS), domain availability @tags(research)
-	- Brainstorm alternative names if "WireBar" is taken @tags(research)
-	- Update all project docs if name changes @tags(docs)
+	- @done Research and validate app name "WireBar" — check Mac App Store, USPTO (TESS), domain availability @tags(research) @done(2026-07-01)
+	- Brainstorm alternative names if "WireBar" is taken @tags(research) — NOT NEEDED, WireBar is clear
+	- @done Update all project docs if name changes @tags(docs) @done(2026-07-01)
 	- @done Set up Git repo and push to GitHub @done(2026-06-22)
 
 Parallel Business Tasks — Start During Early Phases:
-	- Create LemonSqueezy account (identity verification, banking, tax forms) (Scott) @tags(scott, lead-time)
+	- @done Create LemonSqueezy account (identity verification, banking, tax forms) (Scott) @tags(scott, lead-time) @done(2026-07-01) — submitted for KYC approval, awaiting review (1-2 business days)
+	- Create WireBar product listing on LemonSqueezy ($12.99, license keys enabled, activation limit 3) (Scott) @tags(scott, blocking) — blocked on KYC approval
+	- Enable LemonSqueezy test mode and generate test license keys (Scott) @tags(scott) — blocked on KYC approval
 	- Draft privacy policy (human-readable, legally sound) @tags(docs, lead-time)
 	- Draft EULA / Terms of Sale (warranty disclaimer, liability limitation) @tags(docs, lead-time)
 	- Create BSL LICENSE file with 3-year conversion date to Apache 2.0 @tags(legal)
@@ -18,11 +20,11 @@ Parallel Business Tasks — Start During Early Phases:
 
 Phase 6 — Licensing + Updates:
 	Branch: phase/6-licensing-updates
-	- Verify LemonSqueezy Swift SDK exists and supports offline/grace-period validation
-	- Swap LicenseManager stub for real LemonSqueezy SDK integration
-	- Implement license key validation and activation
-	- Implement offline license caching with grace period (network utility must work when network is down)
-	- Implement purchase-to-activation flow (URL scheme deep link or manual key entry — decide and implement)
+	- @done Verify LemonSqueezy Swift SDK exists and supports offline/grace-period validation @done(2026-07-01) — no official SDK; DIY thin URLSession wrapper (~50 lines) for 3 REST endpoints
+	- Build thin LemonSqueezy API wrapper (activate/validate/deactivate via URLSession, form-encoded POST)
+	- Implement license key activation UI (text field + Activate button in LicenseSettingsView — already stubbed)
+	- Implement offline license caching with 7-day grace period + clock-tampering detection
+	- @done Decide purchase-to-activation flow @done(2026-07-01) — manual key entry (user gets key via email receipt, enters in Settings)
 	- Implement device transfer flow (deactivate on old device, reactivate on new)
 	- Implement in-app upgrade prompt (link to LemonSqueezy checkout)
 	- Implement free/paid feature gating across all paid features (verify all isPaid checks work)
@@ -92,8 +94,7 @@ Phase 8 — Release Prep:
 		- Configure GitHub Releases for hosting .dmg and appcast XML
 		- Test full release pipeline end-to-end (build, sign, notarize, staple, .dmg, appcast)
 	LemonSqueezy Setup:
-		- Create product listing on LemonSqueezy ($12.99, description, screenshots) (Scott) @tags(scott)
-		- Configure license key settings in LemonSqueezy dashboard (Scott) @tags(scott)
+		- (Moved to Parallel Business Tasks — account created 2026-07-01, product listing + license keys blocked on KYC)
 		- Test purchase flow end-to-end with test mode (Scott) @tags(scott)
 	Pre-Release Cleanup:
 		- Clean up git history (squash/rebase early commits) before making release-ready

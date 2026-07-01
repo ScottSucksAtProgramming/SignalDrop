@@ -62,3 +62,5 @@ updated: 2026-06-22
 - 2026-06-23: System Settings-style colored sidebar icons need a white SF Symbol on a colored `RoundedRectangle` background — plain `foregroundStyle(color)` on the icon looks flat and unprofessional.
 - 2026-06-23: `.formStyle(.grouped)` on macOS gives the inset rounded-card section appearance (like System Settings). Without it, Forms render flat. Apply to every detail pane in a sidebar settings layout.
 - 2026-06-23: Swift 6 region isolation: capturing a non-Sendable `@ObservedObject` in a `Task {}` inside a SwiftUI view triggers "sending risks data races." Fix with `nonisolated(unsafe) let` capture before the Task.
+- 2026-07-01: LemonSqueezy setup: click "Continue with Lemon Squeezy" (not Stripe Managed Payments) — Managed Payments doesn't have the license key API yet. Classic LemonSqueezy has activate/validate/deactivate endpoints needed for Phase 6.
+- 2026-07-01: LemonSqueezy KYC requires a real website or public GitHub repo — "under construction" pages get rejected. A public repo with a README satisfies the requirement.
