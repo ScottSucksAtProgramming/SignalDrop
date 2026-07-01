@@ -25,14 +25,14 @@ Durable decisions that apply across all slices (from the locked grilling session
 
 Confirmed by grep that all of these are consumed only by the CLI/VPN/helper path:
 
-- `SignalDrop/Sources/Models/VPNDefinition.swift` (also holds the old `VPNState` — replaced in-place)
-- `SignalDrop/Sources/Services/VPNManager/ProcessCommandExecutor.swift`
-- `SignalDrop/Sources/Protocols/VPNCommandExecuting.swift`
-- `SignalDrop/Sources/Protocols/ShellExecuting.swift` — **addition not in the handoff list.** Defines `ShellExecuting` *and* `ShellResult`; both are CLI-only (grep shows no non-VPN consumers).
-- `SignalDrop/Sources/Services/PrivilegedHelper/HelperConstants.swift`
-- `SignalDrop/Sources/Services/PrivilegedHelper/PrivilegedHelperManager.swift`
+- `WireBar/Sources/Models/VPNDefinition.swift` (also holds the old `VPNState` — replaced in-place)
+- `WireBar/Sources/Services/VPNManager/ProcessCommandExecutor.swift`
+- `WireBar/Sources/Protocols/VPNCommandExecuting.swift`
+- `WireBar/Sources/Protocols/ShellExecuting.swift` — **addition not in the handoff list.** Defines `ShellExecuting` *and* `ShellResult`; both are CLI-only (grep shows no non-VPN consumers).
+- `WireBar/Sources/Services/PrivilegedHelper/HelperConstants.swift`
+- `WireBar/Sources/Services/PrivilegedHelper/PrivilegedHelperManager.swift`
 - `PrivilegedHelper/` (top-level target sources: `main.swift`, `Info.plist`, `launchd.plist`)
-- `SignalDropTests/Mocks/MockVPNCommandExecutor.swift`
+- `WireBarTests/Mocks/MockVPNCommandExecutor.swift`
 - Remove the `PrivilegedHelper` target + its `dependencies` entry from `project.yml`.
 
 ### Don't forget (carry to the final slice)
@@ -77,7 +77,7 @@ Make status live. The new `VPNManager` observes `NEVPNStatusDidChange` and repub
 
 ### Acceptance criteria
 
-- [ ] Connecting/disconnecting a VPN from System Settings updates the SignalDrop popover within ~1s with no popover reopen.
+- [ ] Connecting/disconnecting a VPN from System Settings updates the WireBar popover within ~1s with no popover reopen.
 - [ ] Installing/removing a VPN app reloads the list automatically (`NEVPNConfigurationChange`).
 - [ ] A VPN state change clears the IP cache and refreshes the external IP (confirms traffic re-routing).
 - [ ] No polling timer remains anywhere in the codebase.

@@ -1,7 +1,7 @@
 # Settings UI Redesign
 
 **Inspiration:** xIsland app settings (screenshots provided by Scott)
-**Goal:** Modernize SignalDrop's settings window to match the polished sidebar + grouped content pattern.
+**Goal:** Modernize WireBar's settings window to match the polished sidebar + grouped content pattern.
 
 ## Layout
 
@@ -39,11 +39,11 @@ Use SwiftUI `Form` with `Section("Header")` for grouped sections. Existing setti
 
 Centered layout:
 1. App icon (pulled from bundle via `NSImage(named: NSImage.applicationIconName)`)
-2. "SignalDrop" title + version string
+2. "WireBar" title + version string
 3. Row: "Check for Updates..." (triggers Sparkle updater)
-4. Row: "Website" → `https://github.com/ScottSucksAtProgramming/SignalDrop` (external link arrow)
+4. Row: "Website" → `https://github.com/ScottSucksAtProgramming/WireBar` (external link arrow)
 5. Row: "Creator" → "ScottSucksAtProgramming" → `https://github.com/ScottSucksAtProgramming` (external link arrow)
-6. Row: "Report Bug" → `https://github.com/ScottSucksAtProgramming/SignalDrop/issues` (external link arrow)
+6. Row: "Report Bug" → `https://github.com/ScottSucksAtProgramming/WireBar/issues` (external link arrow)
 
 ## License Pane (New)
 

@@ -1,20 +1,20 @@
 ---
-title: "SignalDrop Conventions"
-summary: "Swift/SwiftUI coding conventions, module structure, and naming standards for SignalDrop"
+title: "WireBar Conventions"
+summary: "Swift/SwiftUI coding conventions, module structure, and naming standards for WireBar"
 created: 2026-06-22
 updated: 2026-06-22
 ---
 
-# SignalDrop Conventions
+# WireBar Conventions
 
 ## What Belongs Here
 
-Swift/SwiftUI source code for the SignalDrop macOS menu bar app, Xcode project files, tests, and build configuration. Project planning documents (SPEC, PRD, roadmap) also live at the project root.
+Swift/SwiftUI source code for the WireBar macOS menu bar app, Xcode project files, tests, and build configuration. Project planning documents (SPEC, PRD, roadmap) also live at the project root.
 
 ## What Does NOT Belong Here
 
 - Planning notes and non-code documentation belong in `~/Documents/1_projects/` per the parent workspace rules.
-- General-purpose utilities or libraries that aren't SignalDrop-specific should be separate packages.
+- General-purpose utilities or libraries that aren't WireBar-specific should be separate packages.
 - Credentials, API keys, or license keys must never be committed. Use environment variables or Xcode build settings.
 
 ## Module Structure

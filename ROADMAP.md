@@ -1,4 +1,4 @@
-# SignalDrop - Roadmap
+# WireBar - Roadmap
 
 ## v1.0 - Initial Release
 
@@ -47,7 +47,7 @@ Everything defined in [SPEC.md](SPEC.md). Development tracked in [.taskpaper](.t
 ## v1.x - Post-Launch Improvements
 
 ### Custom VPN Configurations
-- Allow users to create custom VPN profiles from within SignalDrop (if demand exists)
+- Allow users to create custom VPN profiles from within WireBar (if demand exists)
 
 ### VPN Enhancements
 - Expand provider icon library for more VPN apps

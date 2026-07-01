@@ -1,4 +1,4 @@
-# SignalDrop Index
+# WireBar Index
 
 Quick-reference for finding content in this directory. For conventions, see `context/conventions.md`.
 
@@ -15,20 +15,20 @@ Quick-reference for finding content in this directory. For conventions, see `con
 
 | Path | Purpose |
 |------|---------|
-| `SignalDrop/Sources/App/` | App entry point, AppDelegate (menu bar setup, popover, settings window) |
-| `SignalDrop/Sources/Models/` | Data models — NetworkState, ScannedNetwork |
-| `SignalDrop/Sources/Protocols/` | Abstraction protocols — NetworkPathProviding, WLANInterface, ShellExecuting, WiFiScanning, VPNConfigurationProviding |
-| `SignalDrop/Sources/Services/NetworkMonitor/` | NWPathMonitor wrapper — connection state, IP address, Ethernet detection |
-| `SignalDrop/Sources/Services/WiFiManager/` | Wi-Fi management — scanning, joining, power toggle (WiFiManager + CoreWLANScanner) |
-| `SignalDrop/Sources/Services/IPService/` | IP address resolution — local IP from interfaces, external IP via DNS (Cloudflare/OpenDNS), 30s cache, refresh modes |
-| `SignalDrop/Sources/Services/PingService/` | TCP-based latency measurement via NWConnection, configurable target/port |
-| `SignalDrop/Sources/Services/VPNManager/` | VPN management via Network Extension framework — auto-discovery of system VPN profiles, real-time status monitoring, connect/disconnect (VPNManager) |
-| `SignalDrop/Sources/Services/SettingsStore/` | UserDefaults persistence for all settings (launch at login, detail visibility, IP refresh, ping, VPN) |
-| `SignalDrop/Sources/Services/LicenseManager/` | License/paid-tier gating (stub — returns false) |
-| `SignalDrop/Sources/UI/Popover/` | Popover views — PopoverView, ConnectionInfoView, EthernetInfoView, NetworkListView, PasswordInputView, IPPingView, VPNSectionView |
-| `SignalDrop/Sources/UI/Settings/` | Settings window — SettingsView (tabbed), NetworkDetailsSettingsView, IPPingSettingsView, VPNSettingsView |
+| `WireBar/Sources/App/` | App entry point, AppDelegate (menu bar setup, popover, settings window) |
+| `WireBar/Sources/Models/` | Data models — NetworkState, ScannedNetwork |
+| `WireBar/Sources/Protocols/` | Abstraction protocols — NetworkPathProviding, WLANInterface, ShellExecuting, WiFiScanning, VPNConfigurationProviding |
+| `WireBar/Sources/Services/NetworkMonitor/` | NWPathMonitor wrapper — connection state, IP address, Ethernet detection |
+| `WireBar/Sources/Services/WiFiManager/` | Wi-Fi management — scanning, joining, power toggle (WiFiManager + CoreWLANScanner) |
+| `WireBar/Sources/Services/IPService/` | IP address resolution — local IP from interfaces, external IP via DNS (Cloudflare/OpenDNS), 30s cache, refresh modes |
+| `WireBar/Sources/Services/PingService/` | TCP-based latency measurement via NWConnection, configurable target/port |
+| `WireBar/Sources/Services/VPNManager/` | VPN management via Network Extension framework — auto-discovery of system VPN profiles, real-time status monitoring, connect/disconnect (VPNManager) |
+| `WireBar/Sources/Services/SettingsStore/` | UserDefaults persistence for all settings (launch at login, detail visibility, IP refresh, ping, VPN) |
+| `WireBar/Sources/Services/LicenseManager/` | License/paid-tier gating (stub — returns false) |
+| `WireBar/Sources/UI/Popover/` | Popover views — PopoverView, ConnectionInfoView, EthernetInfoView, NetworkListView, PasswordInputView, IPPingView, VPNSectionView |
+| `WireBar/Sources/UI/Settings/` | Settings window — SettingsView (tabbed), NetworkDetailsSettingsView, IPPingSettingsView, VPNSettingsView |
 | ~~`PrivilegedHelper/`~~ | *(Removed — Network Extension framework eliminates the need for a privileged helper)* |
-| `SignalDropTests/` | Unit tests — NetworkMonitor, WiFiManager, SettingsStore, IPService, PingService, VPNManager + mocks |
+| `WireBarTests/` | Unit tests — NetworkMonitor, WiFiManager, SettingsStore, IPService, PingService, VPNManager + mocks |
 
 ## context/
 

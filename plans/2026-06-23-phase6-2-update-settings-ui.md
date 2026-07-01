@@ -17,7 +17,7 @@ Add an "Updates" tab to Settings that lets users control automatic update checki
 
 ### Steps
 
-1. **Create `UpdateSettingsView`** in `SignalDrop/Sources/UI/Settings/`.
+1. **Create `UpdateSettingsView`** in `WireBar/Sources/UI/Settings/`.
    - Toggle: "Automatically check for updates" — bound to `SPUUpdater.automaticallyChecksForUpdates`
    - Button: "Check for Updates Now" — calls `SPUStandardUpdaterController.checkForUpdates(_:)`
    - Display: "Version X.Y.Z (build N)" — read from `Bundle.main`

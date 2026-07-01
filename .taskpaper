@@ -1,11 +1,11 @@
-SignalDrop Development Plan:
+WireBar Development Plan:
 
 Pre-Development — Environment & Account Setup:
 	- @done Verify Developer ID Application certificate exists in Apple Developer account (Scott) @tags(scott, blocking) @done(2026-06-22)
 	- Create Developer ID Application certificate if missing (Scott) @tags(scott, blocking) — NOT NEEDED, cert exists
 	- Create app-specific password for notarytool via Apple ID → Security (Scott) @tags(scott)
-	- Research and validate app name "SignalDrop" — check Mac App Store, USPTO (TESS), domain availability @tags(research)
-	- Brainstorm alternative names if "SignalDrop" is taken @tags(research)
+	- Research and validate app name "WireBar" — check Mac App Store, USPTO (TESS), domain availability @tags(research)
+	- Brainstorm alternative names if "WireBar" is taken @tags(research)
 	- Update all project docs if name changes @tags(docs)
 	- @done Set up Git repo and push to GitHub @done(2026-06-22)
 
@@ -46,8 +46,11 @@ Phase 6 — Licensing + Updates:
 
 Phase 7 — Onboarding + Accessibility Audit:
 	Branch: phase/7-onboarding-accessibility
+	- Add Quit WireBar button to the popover or Settings menu
+	- Check Location Services authorization on launch and prompt user if not granted (SSID requires it)
+	- Add menu bar option to show Wi-Fi signal strength (e.g. dBm or signal bars) next to the icon
 	- Implement first-run detection (check for first launch flag in UserDefaults)
-	- Implement OnboardingView — welcome screen introducing SignalDrop
+	- Implement OnboardingView — welcome screen introducing WireBar
 	- Implement setup wizard step: Location Services explanation and permission request
 	- (Removed — privileged helper no longer needed with Network Extension framework)
 	- Implement setup wizard step: auto-detect installed VPNs, present for user confirmation
@@ -99,7 +102,7 @@ Phase 8 — Release Prep:
 		- Verify all user-facing strings use String(localized:)
 		- Verify no secrets or credentials in repo
 	Name & Branding:
-		- Final name decision (if "SignalDrop" had conflicts, apply chosen name everywhere)
+		- Final name decision (if "WireBar" had conflicts, apply chosen name everywhere)
 		- Register domain name (Scott) @tags(scott)
 		- Update bundle display name, app icon, and all branding assets
 	Competitive Research:
@@ -126,7 +129,7 @@ Post-Launch — V1.x Roadmap:
 		- Create Sentry account and project (Scott) @tags(scott)
 		- Integrate Sentry SDK via SPM
 		- Implement opt-in crash reporting toggle in Settings (off by default)
-		- Implement per-crash consent dialog for non-opted-in users ("SignalDrop quit unexpectedly. Send a crash report?")
+		- Implement per-crash consent dialog for non-opted-in users ("WireBar quit unexpectedly. Send a crash report?")
 		- Sentry SDK only initializes after user opts in — never before
 		- Keep Sentry DSN out of public repo (environment variable or build setting)
 	V1.x — Custom VPN Support:

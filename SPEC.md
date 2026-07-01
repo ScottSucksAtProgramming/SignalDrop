@@ -1,8 +1,8 @@
-# SignalDrop - Product Specification
+# WireBar - Product Specification
 
 ## Overview
 
-**SignalDrop** is a macOS menu bar utility that provides at-a-glance Wi-Fi and VPN status, network switching, VPN toggling, and detailed network information in a clean popover interface.
+**WireBar** is a macOS menu bar utility that provides at-a-glance Wi-Fi and VPN status, network switching, VPN toggling, and detailed network information in a clean popover interface.
 
 ## Technology
 
@@ -123,7 +123,7 @@ App keeps working forever at the last installed version.
 ### Supported VPNs
 - **Any VPN with a system profile** — auto-discovers all VPN configurations visible in System Settings > VPN
 - Works with WireGuard, Tailscale, PIA, Mullvad, NordVPN, corporate VPNs, and any other VPN app that registers a Network Extension profile
-- No curated list to maintain — if the OS sees it, SignalDrop sees it
+- No curated list to maintain — if the OS sees it, WireBar sees it
 
 ### VPN Controls
 - Simple on/off toggle for each VPN
@@ -249,7 +249,7 @@ All hotkeys are user-configurable:
 
 ## First-Run Experience
 
-1. Welcome screen introducing SignalDrop
+1. Welcome screen introducing WireBar
 2. Permission setup wizard:
    - Location Services (required for Wi-Fi SSID)
 3. Auto-detect system VPN profiles, present for user confirmation of which to show

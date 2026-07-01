@@ -1,4 +1,4 @@
-# SignalDrop - Design Decision Log
+# WireBar - Design Decision Log
 
 Record of all decisions made during the initial product design session (2026-06-22).
 
@@ -178,7 +178,7 @@ Custom VPN configurations (user-defined profiles) may be revisited in a future v
 
 ## Q18: App Name
 
-**Decision:** SignalDrop
+**Decision:** WireBar
 
 ---
 
@@ -287,7 +287,7 @@ Paid: VPN monitoring/toggles, external IP, custom VPNs, configurable menu bar di
 
 **Decision:** $12.99 one-time based on competitive analysis.
 
-**Market context:** Consumer Mac networking utilities cluster $9-$30 one-time. One-time purchase dominates (subscriptions deeply unpopular). Comparable apps: Radio Silence ($9), iStat Menus ($11.99), WiFi Explorer ($19.99). SignalDrop is unique in combining Wi-Fi + VPN + network info.
+**Market context:** Consumer Mac networking utilities cluster $9-$30 one-time. One-time purchase dominates (subscriptions deeply unpopular). Comparable apps: Radio Silence ($9), iStat Menus ($11.99), WiFi Explorer ($19.99). WireBar is unique in combining Wi-Fi + VPN + network info.
 
 ---
 
@@ -396,7 +396,7 @@ Paid: VPN monitoring/toggles, external IP, custom VPNs, configurable menu bar di
 
 > Replaces original Q42 (Network Extension rework), Q43 (NE notifications), Q44 (NE-based icons).
 
-**Decision:** VPN feature is **read-only status display with deep-link**. SignalDrop discovers system VPN profiles via `scutil --nc list` (SystemConfiguration), shows their name/status/provider icon, and deep-links to the owning app or System Settings on click. No toggling, no Network Extension, no CLI control.
+**Decision:** VPN feature is **read-only status display with deep-link**. WireBar discovers system VPN profiles via `scutil --nc list` (SystemConfiguration), shows their name/status/provider icon, and deep-links to the owning app or System Settings on click. No toggling, no Network Extension, no CLI control.
 
 **What changed:**
 - **Deleted:** VPNDefinition, ProcessCommandExecutor, VPNCommandExecuting, ShellExecuting, HelperConstants, PrivilegedHelperManager, PrivilegedHelper target, MockVPNCommandExecutor
@@ -405,7 +405,7 @@ Paid: VPN monitoring/toggles, external IP, custom VPNs, configurable menu bar di
 
 **Why:** Two discovery/control approaches failed:
 1. CLI-based (original Phase 4) — VPN apps register system profiles via Network Extension, not CLI tools; CLI toggling was unreliable.
-2. Network Extension (`NETunnelProviderManager.loadAllFromPreferences()`) — returns only configs the calling app created. SignalDrop creates none, so the result is empty. No entitlement grants cross-app visibility. This is macOS sandboxing by design.
+2. Network Extension (`NETunnelProviderManager.loadAllFromPreferences()`) — returns only configs the calling app created. WireBar creates none, so the result is empty. No entitlement grants cross-app visibility. This is macOS sandboxing by design.
 
 `scutil --nc list` reads SystemConfiguration, which does see all system VPN profiles (confirmed on real hardware: "Rivendell" WireGuard + Tailscale both visible with UUID, status, and provider bundle ID). Read-only is the honest scope; deep-linking to the owning app gives users one-click access to toggle.
 

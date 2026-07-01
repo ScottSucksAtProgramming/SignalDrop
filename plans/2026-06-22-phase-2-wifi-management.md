@@ -18,36 +18,36 @@
 
 | File | Responsibility |
 |------|----------------|
-| `SignalDrop/Sources/Protocols/WiFiScanning.swift` | Protocol abstracting CoreWLAN scan/join/power/known-networks for testability |
-| `SignalDrop/Sources/Models/ScannedNetwork.swift` | Value type representing a discovered Wi-Fi network (ssid, rssi, security, isKnown, isCurrent) |
-| `SignalDrop/Sources/Services/WiFiManager/WiFiManager.swift` | Scans for networks, sorts them, joins networks, toggles Wi-Fi power |
-| `SignalDrop/Sources/UI/Popover/NetworkListView.swift` | Network list section: signal bars, security badges, checkmark on current, tap to join |
-| `SignalDrop/Sources/UI/Popover/PasswordInputView.swift` | Inline password field shown when joining an unknown network |
-| `SignalDrop/Sources/UI/Popover/ConnectionInfoView.swift` | Extracted connection header + detail rows (from current PopoverView) |
-| `SignalDrop/Sources/UI/Popover/EthernetInfoView.swift` | Ethernet connection details (IP, gateway) shown when wired connection active |
-| `SignalDrop/Sources/UI/Settings/NetworkDetailsSettingsView.swift` | Settings tab: toggles for which network details appear in popover |
-| `SignalDropTests/WiFiManagerTests.swift` | Unit tests for WiFiManager |
-| `SignalDropTests/Mocks/MockWiFiScanner.swift` | Mock implementation of WiFiScanning protocol |
+| `WireBar/Sources/Protocols/WiFiScanning.swift` | Protocol abstracting CoreWLAN scan/join/power/known-networks for testability |
+| `WireBar/Sources/Models/ScannedNetwork.swift` | Value type representing a discovered Wi-Fi network (ssid, rssi, security, isKnown, isCurrent) |
+| `WireBar/Sources/Services/WiFiManager/WiFiManager.swift` | Scans for networks, sorts them, joins networks, toggles Wi-Fi power |
+| `WireBar/Sources/UI/Popover/NetworkListView.swift` | Network list section: signal bars, security badges, checkmark on current, tap to join |
+| `WireBar/Sources/UI/Popover/PasswordInputView.swift` | Inline password field shown when joining an unknown network |
+| `WireBar/Sources/UI/Popover/ConnectionInfoView.swift` | Extracted connection header + detail rows (from current PopoverView) |
+| `WireBar/Sources/UI/Popover/EthernetInfoView.swift` | Ethernet connection details (IP, gateway) shown when wired connection active |
+| `WireBar/Sources/UI/Settings/NetworkDetailsSettingsView.swift` | Settings tab: toggles for which network details appear in popover |
+| `WireBarTests/WiFiManagerTests.swift` | Unit tests for WiFiManager |
+| `WireBarTests/Mocks/MockWiFiScanner.swift` | Mock implementation of WiFiScanning protocol |
 
 ### Modified Files
 
 | File | Changes |
 |------|---------|
-| `SignalDrop/Sources/Models/NetworkState.swift` | Add `ethernetIPAddress`, `gatewayAddress`, `dnsServers`, `subnetMask`, `primaryInterface` fields |
-| `SignalDrop/Sources/Services/NetworkMonitor/NetworkMonitor.swift` | Extract Ethernet IP + gateway + DNS + subnet; track primary interface |
-| `SignalDrop/Sources/UI/Popover/PopoverView.swift` | Integrate NetworkListView, ConnectionInfoView, EthernetInfoView; add Wi-Fi toggle |
-| `SignalDrop/Sources/App/AppDelegate.swift` | Observe NetworkMonitor state to update menu bar icon dynamically; create and inject WiFiManager |
-| `SignalDrop/Sources/Services/SettingsStore/SettingsStore.swift` | Add detail visibility settings (showBand, showChannel, showLinkSpeed, showBSSID, showDNS, showGateway, showSubnet) |
-| `SignalDrop/Sources/UI/Settings/SettingsView.swift` | Add "Network Details" tab |
-| `SignalDropTests/NetworkMonitorTests.swift` | Add tests for Ethernet state handling |
-| `project.yml` | No changes needed (sources are auto-discovered from SignalDrop/Sources) |
+| `WireBar/Sources/Models/NetworkState.swift` | Add `ethernetIPAddress`, `gatewayAddress`, `dnsServers`, `subnetMask`, `primaryInterface` fields |
+| `WireBar/Sources/Services/NetworkMonitor/NetworkMonitor.swift` | Extract Ethernet IP + gateway + DNS + subnet; track primary interface |
+| `WireBar/Sources/UI/Popover/PopoverView.swift` | Integrate NetworkListView, ConnectionInfoView, EthernetInfoView; add Wi-Fi toggle |
+| `WireBar/Sources/App/AppDelegate.swift` | Observe NetworkMonitor state to update menu bar icon dynamically; create and inject WiFiManager |
+| `WireBar/Sources/Services/SettingsStore/SettingsStore.swift` | Add detail visibility settings (showBand, showChannel, showLinkSpeed, showBSSID, showDNS, showGateway, showSubnet) |
+| `WireBar/Sources/UI/Settings/SettingsView.swift` | Add "Network Details" tab |
+| `WireBarTests/NetworkMonitorTests.swift` | Add tests for Ethernet state handling |
+| `project.yml` | No changes needed (sources are auto-discovered from WireBar/Sources) |
 
 ---
 
 ## Task 1: Create Branch and ScannedNetwork Model
 
 **Files:**
-- Create: `SignalDrop/Sources/Models/ScannedNetwork.swift`
+- Create: `WireBar/Sources/Models/ScannedNetwork.swift`
 
 - [ ] **Step 1: Create the phase branch**
 
@@ -57,7 +57,7 @@ git checkout -b phase/2-wifi-management main
 
 - [ ] **Step 2: Create ScannedNetwork model**
 
-Create `SignalDrop/Sources/Models/ScannedNetwork.swift`:
+Create `WireBar/Sources/Models/ScannedNetwork.swift`:
 
 ```swift
 import Foundation
@@ -114,7 +114,7 @@ enum NetworkSecurityType: Sendable {
 - [ ] **Step 3: Build to verify it compiles**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -5
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -5
 ```
 
 Expected: BUILD SUCCEEDED
@@ -122,7 +122,7 @@ Expected: BUILD SUCCEEDED
 - [ ] **Step 4: Commit**
 
 ```bash
-git add SignalDrop/Sources/Models/ScannedNetwork.swift
+git add WireBar/Sources/Models/ScannedNetwork.swift
 git commit -m "feat: add ScannedNetwork model and NetworkSecurityType enum"
 ```
 
@@ -131,11 +131,11 @@ git commit -m "feat: add ScannedNetwork model and NetworkSecurityType enum"
 ## Task 2: Create WiFiScanning Protocol
 
 **Files:**
-- Create: `SignalDrop/Sources/Protocols/WiFiScanning.swift`
+- Create: `WireBar/Sources/Protocols/WiFiScanning.swift`
 
 - [ ] **Step 1: Create WiFiScanning protocol**
 
-Create `SignalDrop/Sources/Protocols/WiFiScanning.swift`:
+Create `WireBar/Sources/Protocols/WiFiScanning.swift`:
 
 ```swift
 import Foundation
@@ -153,7 +153,7 @@ protocol WiFiScanning {
 - [ ] **Step 2: Build to verify it compiles**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -5
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -5
 ```
 
 Expected: BUILD SUCCEEDED
@@ -161,7 +161,7 @@ Expected: BUILD SUCCEEDED
 - [ ] **Step 3: Commit**
 
 ```bash
-git add SignalDrop/Sources/Protocols/WiFiScanning.swift
+git add WireBar/Sources/Protocols/WiFiScanning.swift
 git commit -m "feat: add WiFiScanning protocol for CoreWLAN abstraction"
 ```
 
@@ -170,16 +170,16 @@ git commit -m "feat: add WiFiScanning protocol for CoreWLAN abstraction"
 ## Task 3: Create Mock and WiFiManager Tests
 
 **Files:**
-- Create: `SignalDropTests/Mocks/MockWiFiScanner.swift`
-- Create: `SignalDropTests/WiFiManagerTests.swift`
+- Create: `WireBarTests/Mocks/MockWiFiScanner.swift`
+- Create: `WireBarTests/WiFiManagerTests.swift`
 
 - [ ] **Step 1: Create MockWiFiScanner**
 
-Create `SignalDropTests/Mocks/MockWiFiScanner.swift`:
+Create `WireBarTests/Mocks/MockWiFiScanner.swift`:
 
 ```swift
 import Foundation
-@testable import SignalDrop
+@testable import WireBar
 
 final class MockWiFiScanner: WiFiScanning {
     var networksToReturn: [ScannedNetwork] = []
@@ -226,11 +226,11 @@ final class MockWiFiScanner: WiFiScanning {
 
 - [ ] **Step 2: Write failing WiFiManager tests**
 
-Create `SignalDropTests/WiFiManagerTests.swift`:
+Create `WireBarTests/WiFiManagerTests.swift`:
 
 ```swift
 import XCTest
-@testable import SignalDrop
+@testable import WireBar
 
 final class WiFiManagerTests: XCTestCase {
     private var mockScanner: MockWiFiScanner!
@@ -385,7 +385,7 @@ final class WiFiManagerTests: XCTestCase {
 - [ ] **Step 3: Run tests to verify they fail**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(Test Case|BUILD|error:)" | head -20
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(Test Case|BUILD|error:)" | head -20
 ```
 
 Expected: FAIL — `WiFiManager` type does not exist
@@ -393,7 +393,7 @@ Expected: FAIL — `WiFiManager` type does not exist
 - [ ] **Step 4: Commit failing tests**
 
 ```bash
-git add SignalDropTests/Mocks/MockWiFiScanner.swift SignalDropTests/WiFiManagerTests.swift
+git add WireBarTests/Mocks/MockWiFiScanner.swift WireBarTests/WiFiManagerTests.swift
 git commit -m "test: add failing WiFiManager tests with MockWiFiScanner"
 ```
 
@@ -402,11 +402,11 @@ git commit -m "test: add failing WiFiManager tests with MockWiFiScanner"
 ## Task 4: Implement WiFiManager
 
 **Files:**
-- Create: `SignalDrop/Sources/Services/WiFiManager/WiFiManager.swift`
+- Create: `WireBar/Sources/Services/WiFiManager/WiFiManager.swift`
 
 - [ ] **Step 1: Implement WiFiManager**
 
-Create `SignalDrop/Sources/Services/WiFiManager/WiFiManager.swift`:
+Create `WireBar/Sources/Services/WiFiManager/WiFiManager.swift`:
 
 ```swift
 import Foundation
@@ -478,7 +478,7 @@ final class WiFiManager: ObservableObject {
 - [ ] **Step 2: Run tests to verify they pass**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(Test Case|BUILD|Executed)" | head -20
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(Test Case|BUILD|Executed)" | head -20
 ```
 
 Expected: All WiFiManagerTests pass, BUILD SUCCEEDED
@@ -486,7 +486,7 @@ Expected: All WiFiManagerTests pass, BUILD SUCCEEDED
 - [ ] **Step 3: Commit**
 
 ```bash
-git add SignalDrop/Sources/Services/WiFiManager/WiFiManager.swift
+git add WireBar/Sources/Services/WiFiManager/WiFiManager.swift
 git commit -m "feat: implement WiFiManager with scan, join, and power toggle"
 ```
 
@@ -495,11 +495,11 @@ git commit -m "feat: implement WiFiManager with scan, join, and power toggle"
 ## Task 5: Implement CoreWLANScanner (Real CoreWLAN Adapter)
 
 **Files:**
-- Create: `SignalDrop/Sources/Services/WiFiManager/CoreWLANScanner.swift`
+- Create: `WireBar/Sources/Services/WiFiManager/CoreWLANScanner.swift`
 
 - [ ] **Step 1: Implement CoreWLANScanner**
 
-Create `SignalDrop/Sources/Services/WiFiManager/CoreWLANScanner.swift`:
+Create `WireBar/Sources/Services/WiFiManager/CoreWLANScanner.swift`:
 
 ```swift
 import Foundation
@@ -589,7 +589,7 @@ final class CoreWLANScanner: WiFiScanning {
 - [ ] **Step 2: Build to verify it compiles**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -5
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -5
 ```
 
 Expected: BUILD SUCCEEDED
@@ -597,7 +597,7 @@ Expected: BUILD SUCCEEDED
 - [ ] **Step 3: Run all tests to check nothing broke**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
 ```
 
 Expected: All tests pass
@@ -605,7 +605,7 @@ Expected: All tests pass
 - [ ] **Step 4: Commit**
 
 ```bash
-git add SignalDrop/Sources/Services/WiFiManager/CoreWLANScanner.swift
+git add WireBar/Sources/Services/WiFiManager/CoreWLANScanner.swift
 git commit -m "feat: implement CoreWLANScanner wrapping real CoreWLAN APIs"
 ```
 
@@ -614,13 +614,13 @@ git commit -m "feat: implement CoreWLANScanner wrapping real CoreWLAN APIs"
 ## Task 6: Extend NetworkState for Ethernet and Multi-Connection Details
 
 **Files:**
-- Modify: `SignalDrop/Sources/Models/NetworkState.swift`
-- Modify: `SignalDrop/Sources/Services/NetworkMonitor/NetworkMonitor.swift`
-- Modify: `SignalDropTests/NetworkMonitorTests.swift`
+- Modify: `WireBar/Sources/Models/NetworkState.swift`
+- Modify: `WireBar/Sources/Services/NetworkMonitor/NetworkMonitor.swift`
+- Modify: `WireBarTests/NetworkMonitorTests.swift`
 
 - [ ] **Step 1: Write tests for new Ethernet state fields**
 
-Add to `SignalDropTests/NetworkMonitorTests.swift`:
+Add to `WireBarTests/NetworkMonitorTests.swift`:
 
 ```swift
 func testInitialEthernetFieldsAreNil() {
@@ -636,14 +636,14 @@ func testInitialEthernetFieldsAreNil() {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(error:|FAIL)" | head -10
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(error:|FAIL)" | head -10
 ```
 
 Expected: FAIL — `ethernetIPAddress`, `gatewayAddress`, etc. do not exist on NetworkState
 
 - [ ] **Step 3: Extend NetworkState**
 
-Edit `SignalDrop/Sources/Models/NetworkState.swift` — add new fields after `isWiFiPoweredOn`:
+Edit `WireBar/Sources/Models/NetworkState.swift` — add new fields after `isWiFiPoweredOn`:
 
 ```swift
 var ethernetIPAddress: String?
@@ -656,7 +656,7 @@ var linkSpeed: Double = 0
 
 - [ ] **Step 4: Extend NetworkMonitor to populate new fields**
 
-In `SignalDrop/Sources/Services/NetworkMonitor/NetworkMonitor.swift`, update `handlePathUpdate` to track the primary interface and extract Ethernet IP. Replace `handlePathUpdate` with:
+In `WireBar/Sources/Services/NetworkMonitor/NetworkMonitor.swift`, update `handlePathUpdate` to track the primary interface and extract Ethernet IP. Replace `handlePathUpdate` with:
 
 ```swift
 private func handlePathUpdate(_ path: NWPath) {
@@ -737,7 +737,7 @@ Update `refreshWiFiInfo()` to call `Self.getIPAddress()` (no change to the call 
 - [ ] **Step 5: Run tests to verify they pass**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
 ```
 
 Expected: All tests pass
@@ -745,7 +745,7 @@ Expected: All tests pass
 - [ ] **Step 6: Commit**
 
 ```bash
-git add SignalDrop/Sources/Models/NetworkState.swift SignalDrop/Sources/Services/NetworkMonitor/NetworkMonitor.swift SignalDropTests/NetworkMonitorTests.swift
+git add WireBar/Sources/Models/NetworkState.swift WireBar/Sources/Services/NetworkMonitor/NetworkMonitor.swift WireBarTests/NetworkMonitorTests.swift
 git commit -m "feat: extend NetworkState with Ethernet IP, gateway, DNS, primary interface"
 ```
 
@@ -754,12 +754,12 @@ git commit -m "feat: extend NetworkState with Ethernet IP, gateway, DNS, primary
 ## Task 7: Add Network Detail Visibility Settings
 
 **Files:**
-- Modify: `SignalDrop/Sources/Services/SettingsStore/SettingsStore.swift`
-- Modify: `SignalDropTests/SettingsStoreTests.swift`
+- Modify: `WireBar/Sources/Services/SettingsStore/SettingsStore.swift`
+- Modify: `WireBarTests/SettingsStoreTests.swift`
 
 - [ ] **Step 1: Write failing tests for new settings**
 
-Add to `SignalDropTests/SettingsStoreTests.swift`:
+Add to `WireBarTests/SettingsStoreTests.swift`:
 
 ```swift
 func testDefaultShowBandIsFalse() {
@@ -809,14 +809,14 @@ func testSetShowBandPersists() {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(error:|FAIL)" | head -10
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(error:|FAIL)" | head -10
 ```
 
 Expected: FAIL — properties don't exist
 
 - [ ] **Step 3: Add settings to SettingsStore**
 
-Edit `SignalDrop/Sources/Services/SettingsStore/SettingsStore.swift`. Add the new properties after `showSignalStrength`, following the same pattern:
+Edit `WireBar/Sources/Services/SettingsStore/SettingsStore.swift`. Add the new properties after `showSignalStrength`, following the same pattern:
 
 ```swift
 @Published var showBand: Bool = false {
@@ -889,7 +889,7 @@ static let showSubnet = "showSubnet"
 - [ ] **Step 4: Run tests to verify they pass**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
 ```
 
 Expected: All tests pass
@@ -897,7 +897,7 @@ Expected: All tests pass
 - [ ] **Step 5: Commit**
 
 ```bash
-git add SignalDrop/Sources/Services/SettingsStore/SettingsStore.swift SignalDropTests/SettingsStoreTests.swift
+git add WireBar/Sources/Services/SettingsStore/SettingsStore.swift WireBarTests/SettingsStoreTests.swift
 git commit -m "feat: add network detail visibility settings to SettingsStore"
 ```
 
@@ -906,13 +906,13 @@ git commit -m "feat: add network detail visibility settings to SettingsStore"
 ## Task 8: Create Network Details Settings Tab (UI)
 
 **Files:**
-- Create: `SignalDrop/Sources/UI/Settings/NetworkDetailsSettingsView.swift`
-- Modify: `SignalDrop/Sources/UI/Settings/SettingsView.swift`
-- Modify: `SignalDrop/Sources/App/SignalDropApp.swift`
+- Create: `WireBar/Sources/UI/Settings/NetworkDetailsSettingsView.swift`
+- Modify: `WireBar/Sources/UI/Settings/SettingsView.swift`
+- Modify: `WireBar/Sources/App/WireBarApp.swift`
 
 - [ ] **Step 1: Create NetworkDetailsSettingsView**
 
-Create `SignalDrop/Sources/UI/Settings/NetworkDetailsSettingsView.swift`:
+Create `WireBar/Sources/UI/Settings/NetworkDetailsSettingsView.swift`:
 
 ```swift
 import SwiftUI
@@ -974,7 +974,7 @@ struct NetworkDetailsSettingsView: View {
 
 - [ ] **Step 2: Update SettingsView to add Network Details tab**
 
-Replace the contents of `SignalDrop/Sources/UI/Settings/SettingsView.swift`:
+Replace the contents of `WireBar/Sources/UI/Settings/SettingsView.swift`:
 
 ```swift
 import SwiftUI
@@ -1004,22 +1004,22 @@ struct GeneralSettingsView: View {
     var body: some View {
         Form {
             Toggle(String(localized: "Launch at login"), isOn: $settingsStore.launchAtLogin)
-                .accessibilityLabel(String(localized: "Launch SignalDrop when you log in"))
+                .accessibilityLabel(String(localized: "Launch WireBar when you log in"))
         }
         .padding()
     }
 }
 ```
 
-- [ ] **Step 3: Update SignalDropApp to pass dependencies to SettingsView**
+- [ ] **Step 3: Update WireBarApp to pass dependencies to SettingsView**
 
-Replace the contents of `SignalDrop/Sources/App/SignalDropApp.swift`:
+Replace the contents of `WireBar/Sources/App/WireBarApp.swift`:
 
 ```swift
 import SwiftUI
 
 @main
-struct SignalDropApp: App {
+struct WireBarApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
@@ -1042,7 +1042,7 @@ If the build fails because AppDelegate properties are private, temporarily chang
 - [ ] **Step 5: Commit**
 
 ```bash
-git add SignalDrop/Sources/UI/Settings/NetworkDetailsSettingsView.swift SignalDrop/Sources/UI/Settings/SettingsView.swift SignalDrop/Sources/App/SignalDropApp.swift
+git add WireBar/Sources/UI/Settings/NetworkDetailsSettingsView.swift WireBar/Sources/UI/Settings/SettingsView.swift WireBar/Sources/App/WireBarApp.swift
 git commit -m "feat: add Network Details settings tab with paid-tier gating"
 ```
 
@@ -1051,13 +1051,13 @@ git commit -m "feat: add Network Details settings tab with paid-tier gating"
 ## Task 9: Extract ConnectionInfoView from PopoverView
 
 **Files:**
-- Create: `SignalDrop/Sources/UI/Popover/ConnectionInfoView.swift`
+- Create: `WireBar/Sources/UI/Popover/ConnectionInfoView.swift`
 
 - [ ] **Step 1: Create ConnectionInfoView**
 
 This extracts the connection header and network details from PopoverView into its own view, now respecting SettingsStore visibility toggles.
 
-Create `SignalDrop/Sources/UI/Popover/ConnectionInfoView.swift`:
+Create `WireBar/Sources/UI/Popover/ConnectionInfoView.swift`:
 
 ```swift
 import SwiftUI
@@ -1275,13 +1275,13 @@ struct ConnectionInfoView: View {
 - [ ] **Step 2: Build to verify**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -5
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -5
 ```
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add SignalDrop/Sources/UI/Popover/ConnectionInfoView.swift
+git add WireBar/Sources/UI/Popover/ConnectionInfoView.swift
 git commit -m "feat: extract ConnectionInfoView with configurable detail visibility"
 ```
 
@@ -1290,11 +1290,11 @@ git commit -m "feat: extract ConnectionInfoView with configurable detail visibil
 ## Task 10: Create EthernetInfoView
 
 **Files:**
-- Create: `SignalDrop/Sources/UI/Popover/EthernetInfoView.swift`
+- Create: `WireBar/Sources/UI/Popover/EthernetInfoView.swift`
 
 - [ ] **Step 1: Create EthernetInfoView**
 
-Create `SignalDrop/Sources/UI/Popover/EthernetInfoView.swift`:
+Create `WireBar/Sources/UI/Popover/EthernetInfoView.swift`:
 
 ```swift
 import SwiftUI
@@ -1349,13 +1349,13 @@ struct EthernetInfoView: View {
 - [ ] **Step 2: Build to verify**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -5
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -5
 ```
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add SignalDrop/Sources/UI/Popover/EthernetInfoView.swift
+git add WireBar/Sources/UI/Popover/EthernetInfoView.swift
 git commit -m "feat: add EthernetInfoView for wired connection details"
 ```
 
@@ -1364,12 +1364,12 @@ git commit -m "feat: add EthernetInfoView for wired connection details"
 ## Task 11: Create NetworkListView and PasswordInputView
 
 **Files:**
-- Create: `SignalDrop/Sources/UI/Popover/NetworkListView.swift`
-- Create: `SignalDrop/Sources/UI/Popover/PasswordInputView.swift`
+- Create: `WireBar/Sources/UI/Popover/NetworkListView.swift`
+- Create: `WireBar/Sources/UI/Popover/PasswordInputView.swift`
 
 - [ ] **Step 1: Create PasswordInputView**
 
-Create `SignalDrop/Sources/UI/Popover/PasswordInputView.swift`:
+Create `WireBar/Sources/UI/Popover/PasswordInputView.swift`:
 
 ```swift
 import SwiftUI
@@ -1421,7 +1421,7 @@ struct PasswordInputView: View {
 
 - [ ] **Step 2: Create NetworkListView**
 
-Create `SignalDrop/Sources/UI/Popover/NetworkListView.swift`:
+Create `WireBar/Sources/UI/Popover/NetworkListView.swift`:
 
 ```swift
 import SwiftUI
@@ -1623,13 +1623,13 @@ extension SignalQuality {
 - [ ] **Step 3: Build to verify**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -5
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -5
 ```
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add SignalDrop/Sources/UI/Popover/NetworkListView.swift SignalDrop/Sources/UI/Popover/PasswordInputView.swift
+git add WireBar/Sources/UI/Popover/NetworkListView.swift WireBar/Sources/UI/Popover/PasswordInputView.swift
 git commit -m "feat: add NetworkListView with signal indicators, security badges, and password input"
 ```
 
@@ -1638,12 +1638,12 @@ git commit -m "feat: add NetworkListView with signal indicators, security badges
 ## Task 12: Rewrite PopoverView and Update AppDelegate
 
 **Files:**
-- Modify: `SignalDrop/Sources/UI/Popover/PopoverView.swift`
-- Modify: `SignalDrop/Sources/App/AppDelegate.swift`
+- Modify: `WireBar/Sources/UI/Popover/PopoverView.swift`
+- Modify: `WireBar/Sources/App/AppDelegate.swift`
 
 - [ ] **Step 1: Rewrite PopoverView to integrate all new views**
 
-Replace the contents of `SignalDrop/Sources/UI/Popover/PopoverView.swift`:
+Replace the contents of `WireBar/Sources/UI/Popover/PopoverView.swift`:
 
 ```swift
 import SwiftUI
@@ -1734,7 +1734,7 @@ struct DetailRow: View {
 
 - [ ] **Step 2: Update AppDelegate**
 
-Replace the contents of `SignalDrop/Sources/App/AppDelegate.swift`:
+Replace the contents of `WireBar/Sources/App/AppDelegate.swift`:
 
 ```swift
 import AppKit
@@ -1765,7 +1765,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "wifi", accessibilityDescription: String(localized: "SignalDrop network status"))
+            button.image = NSImage(systemSymbolName: "wifi", accessibilityDescription: String(localized: "WireBar network status"))
             button.action = #selector(togglePopover)
             button.target = self
         }
@@ -1810,7 +1810,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         button.image = NSImage(
             systemSymbolName: symbolName,
-            accessibilityDescription: String(localized: "SignalDrop network status")
+            accessibilityDescription: String(localized: "WireBar network status")
         )
     }
 
@@ -1831,7 +1831,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 - [ ] **Step 3: Build to verify**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -5
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -5
 ```
 
 Expected: BUILD SUCCEEDED
@@ -1839,7 +1839,7 @@ Expected: BUILD SUCCEEDED
 - [ ] **Step 4: Run all tests**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild test -project WireBar.xcodeproj -scheme WireBar -configuration Debug 2>&1 | grep -E "(Executed|BUILD)" | tail -3
 ```
 
 Expected: All tests pass
@@ -1847,7 +1847,7 @@ Expected: All tests pass
 - [ ] **Step 5: Commit**
 
 ```bash
-git add SignalDrop/Sources/UI/Popover/PopoverView.swift SignalDrop/Sources/App/AppDelegate.swift
+git add WireBar/Sources/UI/Popover/PopoverView.swift WireBar/Sources/App/AppDelegate.swift
 git commit -m "feat: integrate WiFiManager, dynamic menu bar icon, and Wi-Fi toggle into popover"
 ```
 
@@ -1864,7 +1864,7 @@ git commit -m "feat: integrate WiFiManager, dynamic menu bar icon, and Wi-Fi tog
 Add the new files to the tree:
 
 ```
-SignalDrop/
+WireBar/
   Sources/
     ...
     Models/
@@ -1898,7 +1898,7 @@ SignalDrop/
         NetworkDetailsSettingsView.swift
       Onboarding/
   ...
-SignalDropTests/
+WireBarTests/
   NetworkMonitorTests.swift
   SettingsStoreTests.swift
   WiFiManagerTests.swift
@@ -1934,8 +1934,8 @@ git commit -m "docs: update tree and mark Phase 2 tasks complete"
 - [ ] **Step 1: Build and launch**
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project SignalDrop.xcodeproj -scheme SignalDrop -configuration Debug build 2>&1 | tail -3
-open DerivedData/Build/Products/Debug/SignalDrop.app
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project WireBar.xcodeproj -scheme WireBar -configuration Debug build 2>&1 | tail -3
+open DerivedData/Build/Products/Debug/WireBar.app
 ```
 
 - [ ] **Step 2: Visual verification via computer-use**

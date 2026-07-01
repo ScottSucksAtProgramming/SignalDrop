@@ -1,6 +1,6 @@
 # Session Workflow
 
-How to start and execute a new development phase in SignalDrop.
+How to start and execute a new development phase in WireBar.
 
 ## Phase Workflow
 

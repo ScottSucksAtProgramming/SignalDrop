@@ -1,4 +1,4 @@
-name: SignalDrop
+name: WireBar
 options:
   bundleIdPrefix: com.scottkostolni
   deploymentTarget:
@@ -20,40 +20,40 @@ packages:
     from: "2.0.0"
 
 targets:
-  SignalDrop:
+  WireBar:
     type: application
     platform: macOS
     sources:
-      - path: SignalDrop/Sources
-      - path: SignalDrop/Resources
+      - path: WireBar/Sources
+      - path: WireBar/Resources
     dependencies:
       - package: Sparkle
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.scottkostolni.SignalDrop
-        INFOPLIST_FILE: SignalDrop/Resources/Info.plist
-        CODE_SIGN_ENTITLEMENTS: SignalDrop/Resources/SignalDrop.entitlements
-        PRODUCT_NAME: SignalDrop
+        PRODUCT_BUNDLE_IDENTIFIER: com.scottkostolni.WireBar
+        INFOPLIST_FILE: WireBar/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: WireBar/Resources/WireBar.entitlements
+        PRODUCT_NAME: WireBar
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     entitlements:
-      path: SignalDrop/Resources/SignalDrop.entitlements
+      path: WireBar/Resources/WireBar.entitlements
       properties:
         com.apple.security.app-sandbox: false
         com.apple.security.network.client: true
 
-  SignalDropTests:
+  WireBarTests:
     type: bundle.unit-test
     platform: macOS
     sources:
-      - path: SignalDropTests
+      - path: WireBarTests
     dependencies:
-      - target: SignalDrop
+      - target: WireBar
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.scottkostolni.SignalDropTests
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SignalDrop.app/Contents/MacOS/SignalDrop"
+        PRODUCT_BUNDLE_IDENTIFIER: com.scottkostolni.WireBarTests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/WireBar.app/Contents/MacOS/WireBar"
         BUNDLE_LOADER: "$(TEST_HOST)"
         GENERATE_INFOPLIST_FILE: true

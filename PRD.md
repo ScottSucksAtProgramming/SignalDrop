@@ -1,4 +1,4 @@
-# PRD: SignalDrop - macOS Menu Bar Network Utility
+# PRD: WireBar - macOS Menu Bar Network Utility
 
 ## Problem Statement
 
@@ -6,7 +6,7 @@ macOS provides basic Wi-Fi status in the menu bar, but it lacks integrated VPN v
 
 ## Solution
 
-SignalDrop is a lightweight macOS menu bar utility that consolidates Wi-Fi management, VPN monitoring and control, and network information into a single SwiftUI popover. Users see their network status at a glance in the menu bar (configurable: Wi-Fi icon, network name, VPN indicators, IP address) and click to open a rich popover with full connection details, VPN toggle switches, available Wi-Fi networks, and quick actions. The app supports a freemium model — core Wi-Fi features are free, while VPN management and advanced features require a one-time paid license.
+WireBar is a lightweight macOS menu bar utility that consolidates Wi-Fi management, VPN monitoring and control, and network information into a single SwiftUI popover. Users see their network status at a glance in the menu bar (configurable: Wi-Fi icon, network name, VPN indicators, IP address) and click to open a rich popover with full connection details, VPN toggle switches, available Wi-Fi networks, and quick actions. The app supports a freemium model — core Wi-Fi features are free, while VPN management and advanced features require a one-time paid license.
 
 ## User Stories
 
@@ -152,7 +152,7 @@ The app is structured around deep, independently testable modules with clean int
 
 ### Testing Philosophy
 
-Tests should verify external behavior through each module's public interface, not implementation details. A good test for SignalDrop:
+Tests should verify external behavior through each module's public interface, not implementation details. A good test for WireBar:
 - Calls a module's public API and asserts on the observable output
 - Does not depend on internal state or private methods
 - Uses protocol-based dependency injection to mock system APIs (CoreWLAN, NWPathMonitor, shell execution)

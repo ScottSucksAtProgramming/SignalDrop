@@ -1,16 +1,16 @@
 ---
-title: "SignalDrop Lessons Learned"
-summary: "Running log of corrections, preferences, and discoveries during SignalDrop development"
+title: "WireBar Lessons Learned"
+summary: "Running log of corrections, preferences, and discoveries during WireBar development"
 created: 2026-06-22
 updated: 2026-06-22
 ---
 
-# SignalDrop Lessons Learned
+# WireBar Lessons Learned
 
 <!-- Append dated one-liners below. When 3+ related lessons accumulate on a topic, extract into a dedicated context file. -->
 
 - 2026-06-23: `SPUStandardUpdaterController` is a plain reference type (not ObservableObject); bind its `automaticallyChecksForUpdates` property via an explicit `Binding(get:set:)` rather than `@ObservedObject` — no Sparkle state mirroring needed in SettingsStore.
-- 2026-06-23: When adding a required parameter to a SwiftUI view, search all call sites — `SettingsView` was instantiated in both `AppDelegate.openSettings()` and `SignalDropApp.body`; both needed updating.
+- 2026-06-23: When adding a required parameter to a SwiftUI view, search all call sites — `SettingsView` was instantiated in both `AppDelegate.openSettings()` and `WireBarApp.body`; both needed updating.
 
 - 2026-06-22: DNS-based IP lookup (Cloudflare/OpenDNS) is faster, more private, and more reliable than HTTPS APIs for external IP detection.
 - 2026-06-22: ICMP ping requires raw sockets and special entitlements on macOS — use TCP-based latency via NWConnection instead.
@@ -27,9 +27,9 @@ updated: 2026-06-22
 - 2026-06-22: NWPathMonitor.pathUpdateHandler fires asynchronously — read currentPath on start() to avoid stale initial UI state.
 - 2026-06-22: CLLocationManager.requestWhenInUseAuthorization() silently does nothing for debug builds outside /Applications. Users must grant Location Services manually in System Settings during development. Onboarding wizard will handle this for release builds.
 - 2026-06-22: CWInterface.ssid() returns nil without Location Services, but channel, signal, and transmitRate still work. Show "Wi-Fi Connected" as fallback instead of "Not Connected" to avoid misleading the user.
-- 2026-06-22: Computer-use screenshot filtering hides menu bar status items from apps not in the installed app registry. Debug builds from DerivedData and even copies in /Applications are not recognized by the computer-use tool's app detection. Manual testing of SignalDrop's menu bar UI requires user confirmation until the app is properly distributed.
-- 2026-06-22: SignalDrop's menu bar icon IS visible in screenshots and clickable, but the popover window is hidden by screenshot filtering for unrecognized apps. The icon is a `(( ))` antenna shape (antenna.radiowaves.left.and.right), located between battery % and memory readout in the menu bar — NOT near the left-side system icons.
-- 2026-06-22: Computer-use app detection requires the app to be in /Applications BEFORE session start. Copying mid-session doesn't register. SignalDrop.app is now in /Applications — new sessions should see it. Use bundle ID `com.scottkostolni.SignalDrop` if name lookup fails.
+- 2026-06-22: Computer-use screenshot filtering hides menu bar status items from apps not in the installed app registry. Debug builds from DerivedData and even copies in /Applications are not recognized by the computer-use tool's app detection. Manual testing of WireBar's menu bar UI requires user confirmation until the app is properly distributed.
+- 2026-06-22: WireBar's menu bar icon IS visible in screenshots and clickable, but the popover window is hidden by screenshot filtering for unrecognized apps. The icon is a `(( ))` antenna shape (antenna.radiowaves.left.and.right), located between battery % and memory readout in the menu bar — NOT near the left-side system icons.
+- 2026-06-22: Computer-use app detection requires the app to be in /Applications BEFORE session start. Copying mid-session doesn't register. WireBar.app is now in /Applications — new sessions should see it. Use bundle ID `com.scottkostolni.WireBar` if name lookup fails.
 - 2026-06-22: CWSecurity in Swift 6 SDK has no .wep case — use .dynamicWEP (lowercase). Case names follow Swift 3+ naming (.dynamicWEP not .DynamicWEP).
 - 2026-06-22: CWConfiguration.networkProfiles returns non-optional NSOrderedSet — cast elements to CWNetworkProfile directly, no optional binding needed.
 - 2026-06-22: CWInterface.scanForNetworks(withName: nil) blocks for 1-3 seconds — always call off main thread in production.
@@ -58,3 +58,7 @@ updated: 2026-06-22
 - 2026-06-23: Hotkey bindings stored in UserDefaults must be seeded with defaults on first run, not left empty — otherwise hotkeys ship dead until the user manually records each one. "Reset to Defaults" must restore to the seeded defaults, not clear to empty.
 - 2026-06-23: NSStatusBarButton needs `.imagePosition = .imageLeading` when setting both `.image` and `.title` — without it the title won't render next to the icon.
 - 2026-06-23: Sparkle 2.x SPM integration via XcodeGen: add top-level `packages:` block + `dependencies: [package: Sparkle]` on the app target. `SPUStandardUpdaterController(startingUpdater: true, ...)` on `@MainActor AppDelegate` has no Swift 6 concurrency issues. Empty `SUPublicEDKey` does NOT cause test-host abort — tests pass cleanly.
+- 2026-06-23: `.tabViewStyle(.grouped)` does NOT exist in SwiftUI for macOS. For System Settings-style sidebar navigation, use `NavigationSplitView` with a `List(selection:)` sidebar. Available macOS 13+.
+- 2026-06-23: System Settings-style colored sidebar icons need a white SF Symbol on a colored `RoundedRectangle` background — plain `foregroundStyle(color)` on the icon looks flat and unprofessional.
+- 2026-06-23: `.formStyle(.grouped)` on macOS gives the inset rounded-card section appearance (like System Settings). Without it, Forms render flat. Apply to every detail pane in a sidebar settings layout.
+- 2026-06-23: Swift 6 region isolation: capturing a non-Sendable `@ObservedObject` in a `Task {}` inside a SwiftUI view triggers "sending risks data races." Fix with `nonisolated(unsafe) let` capture before the Task.

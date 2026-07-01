@@ -14,7 +14,7 @@ Durable decisions that apply across all update-related phases:
 - **Update policy**: Updates are public and ungated. The license gates features, not the update channel. All users (free and paid) receive updates.
 - **Distribution**: `.dmg` files attached to GitHub Releases. `generate_appcast` builds the appcast XML from release assets.
 - **Check behavior**: Automatic check on launch with Sparkle's standard update dialog. User can disable in Settings (Phase 6.2).
-- **macOS compat**: Sparkle 2.x supports macOS 11+, well within SignalDrop's macOS 13+ target.
+- **macOS compat**: Sparkle 2.x supports macOS 11+, well within WireBar's macOS 13+ target.
 
 ---
 

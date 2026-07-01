@@ -1,4 +1,4 @@
-# SignalDrop
+# WireBar
 
 ## Purpose
 
@@ -17,10 +17,10 @@ wifi-menubar/
   PRD.md
   ROADMAP.md
   DESIGN_DECISIONS.md
-  SignalDrop/
+  WireBar/
     Sources/
       App/
-        SignalDropApp.swift
+        WireBarApp.swift
         AppDelegate.swift
       Models/
         NetworkState.swift
@@ -79,8 +79,8 @@ wifi-menubar/
         Onboarding/
     Resources/
       Info.plist
-      SignalDrop.entitlements
-  SignalDropTests/
+      WireBar.entitlements
+  WireBarTests/
     NetworkMonitorTests.swift
     SettingsStoreTests.swift
     WiFiManagerTests.swift
@@ -165,12 +165,12 @@ wifi-menubar/
 4. Target macOS 13+ (Ventura). Use `@available` checks for any API not available in Ventura.
 5. Follow Apple's Human Interface Guidelines for menu bar apps and popovers.
 
-## SignalDrop-Specific Rules
+## WireBar-Specific Rules
 
 1. **No data logging to disk.** All network info stays in-memory only. This is a core trust promise.
 2. **Crash reporting (Sentry) must never initialize unless the user has explicitly opted in.** No silent telemetry.
 3. **All external network calls must use HTTPS only.**
-4. **VPN status is read-only via SystemConfiguration** (`scutil --nc list`). SignalDrop cannot toggle other apps' VPN tunnels — macOS sandboxes Network Extension configs per-app. Clicking a VPN row deep-links to the owning app (or System Settings). No CLI-based control, no shell toggling, no privileged helper.
+4. **VPN status is read-only via SystemConfiguration** (`scutil --nc list`). WireBar cannot toggle other apps' VPN tunnels — macOS sandboxes Network Extension configs per-app. Clicking a VPN row deep-links to the owning app (or System Settings). No CLI-based control, no shell toggling, no privileged helper.
 5. **Paid features must be gated through LicenseManager** — never hardcode tier checks or scatter `if paid` logic through the codebase.
 6. **Follow the module boundaries in PRD.md.** Modules communicate through their public interfaces. Don't reach into another module's internals.
 
